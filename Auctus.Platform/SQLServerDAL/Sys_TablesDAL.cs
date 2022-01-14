@@ -279,7 +279,7 @@ VALUES  ( N'' ,
         {
             List<SqlCommandData> sqlCommands = new List<SqlCommandData>();//事务参数
             IDataBase dbDefault = DBHelperFactory.Create(defaultCon);
-            SqlCommandData sc2 = SqlFactory.CreateInsertSqlByRef<MyPlatform.Model.Sys_TablesModel>(model);
+            SqlCommandData sc2 = SqlFactory.CreateInsertSqlByRefTable<MyPlatform.Model.Sys_TablesModel>(model,"Sys_Tables");
             sqlCommands.Add(sc2);
             //dbDefault.ExecuteTran(sqlCommands);
             //sqlCommands = new List<SqlCommandData>();
