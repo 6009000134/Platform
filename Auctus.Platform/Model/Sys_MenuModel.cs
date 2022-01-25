@@ -138,5 +138,10 @@ namespace MyPlatform.Model
         /// </summary>
         public Sys_VueRouterModel Router { get; set; }
 
+        /// <summary>
+        /// 子菜单
+        /// </summary>
+        public Sys_MenuModel ChildMenu { get; set; }
+
     }
 }

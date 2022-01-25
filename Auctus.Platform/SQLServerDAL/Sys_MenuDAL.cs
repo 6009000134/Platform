@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Data;
 using MyPlatform.DBUtility;
 using MyPlatform.IDAL;
+using MyPlatform.Model;
+
 namespace MyPlatform.SQLServerDAL
 {
     //Sys_Menu
@@ -144,6 +146,92 @@ SELECT * FROM menu
 order by FullMenuPath
 ";
             return db.Query(sql);
+        }
+        public DataSet GetList(IDataBase db, Pagination page, List<QueryConditionModel> conditions)
+        {
+            List<SqlCommandData> liCmd = new List<SqlCommandData>();
+            SqlCommandData scd = new SqlCommandData();
+            scd.Paras = new List<SqlParameter>();
+            scd.CommandBehavior = SqlServerCommandBehavior.ExecuteReader;
+
+            SqlCommandData scdTotal = new SqlCommandData();
+            scdTotal.Paras = new List<SqlParameter>();
+            scdTotal.CommandBehavior = SqlServerCommandBehavior.ExecuteReader;
+
+            scd.CommandText = @";
+WITH menu AS
+(
+SELECT a.ID,a.CreatedBy,a.CreatedDate,a.UpdatedBy,a.UpdatedDate,a.MenuName,a.Uri,a.ParentID
+,b.ID RouterID,b.Path,b.Name,b.Meta,b.Component,b.MenuID
+FROM dbo.Sys_Menu a LEFT JOIN dbo.Sys_VueRouter b ON a.ID=b.MenuID
+),
+Result AS
+(
+SELECT a.ID,a.CreatedBy,a.CreatedDate,a.UpdatedBy,a.UpdatedDate,a.MenuName,a.Uri,a.ParentID
+,a.RouterID,a.Path,a.Name,a.Meta,a.Component,a.MenuID,CAST(a.MenuName  AS VARCHAR(8000))FullPath
+FROM menu a WHERE a.ParentID=0
+UNION ALL 
+SELECT b.ID,b.CreatedBy,b.CreatedDate,b.UpdatedBy,b.UpdatedDate,b.MenuName,b.Uri,b.ParentID
+,b.RouterID,b.Path,b.Name,b.Meta,b.Component,b.MenuID,cast (CONVERT(varchar(100),a.FullPath)+'/'+CONVERT(VARCHAR(100),b.MenuName) AS varchar(8000))
+FROM Result a INNER JOIN menu b ON a.ID=b.ParentID
+)
+select * from (SELECT t.*,ROW_NUMBER()OVER(ORDER BY t.FullPath) OrderNo
+FROM Result t) t
+where 1=1 ";
+
+            scdTotal.CommandText = @"WITH menu AS
+(
+SELECT a.ID,a.CreatedBy,a.CreatedDate,a.UpdatedBy,a.UpdatedDate,a.MenuName,a.Uri,a.ParentID
+,b.ID RouterID,b.Path,b.Name,b.Meta,b.Component,b.MenuID
+FROM dbo.Sys_Menu a LEFT JOIN dbo.Sys_VueRouter b ON a.ID=b.MenuID
+),
+Result AS
+(
+SELECT a.ID,a.CreatedBy,a.CreatedDate,a.UpdatedBy,a.UpdatedDate,a.MenuName,a.Uri,a.ParentID
+,a.RouterID,a.Path,a.Name,a.Meta,a.Component,a.MenuID,CAST(a.MenuName  AS VARCHAR(8000))FullPath
+FROM menu a WHERE a.ParentID=0
+UNION ALL 
+SELECT b.ID,b.CreatedBy,b.CreatedDate,b.UpdatedBy,b.UpdatedDate,b.MenuName,b.Uri,b.ParentID
+,b.RouterID,b.Path,b.Name,b.Meta,b.Component,b.MenuID,cast (CONVERT(varchar(100),a.FullPath)+'/'+CONVERT(VARCHAR(100),b.MenuName) AS varchar(8000))
+FROM Result a INNER JOIN menu b ON a.ID=b.ParentID
+)
+SELECT count(1)TotalCount 
+FROM Result t
+where 1=1 ";
+            if (conditions.Count > 0)
+            {
+                foreach (QueryConditionModel item in conditions)
+                {
+                    scd.CommandText += item.Key;
+                    scdTotal.CommandText += item.Key;
+                    switch (item.Operator)
+                    {
+                        case "=":
+                            scd.CommandText += " = ";
+                            scdTotal.CommandText += " = ";
+                            break;
+                        default:
+                            scd.CommandText += " " + item.Operator + " ";
+                            scdTotal.CommandText += " " + item.Operator + " ";
+                            break;
+                    }
+                    scd.CommandText += "@" + item.Key;
+                    scdTotal.CommandText += "@" + item.Key;
+                    SqlParameter par = new SqlParameter("@" + item.Key, item.Value);
+                    scd.Paras.Add(par);
+                    scdTotal.Paras.Add(par);
+                }
+            }
+
+            SqlParameter parStart = new SqlParameter("@startIndex", page.startIndex);
+            SqlParameter parEnd = new SqlParameter("@endIndex", page.endIndex);
+            scd.Paras.Add(parStart);
+            scd.Paras.Add(parEnd);
+            scd.CommandText += " and t.OrderNo>@startIndex and t.OrderNo<@endIndex  ";
+            scd.CommandText += " order by t.OrderNo ";
+            liCmd.Add(scd);
+            liCmd.Add(scdTotal);
+            return db.Query(liCmd);
         }
     }
 }

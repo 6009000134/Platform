@@ -22,7 +22,7 @@ namespace MyPlatform.BLL
             {
                 //根据tableid获取数据库连接名
                 Sys_TablesBLL t = new Sys_TablesBLL();
-                ReturnData tableInfo = t.GetDetail(model.TableID, new Pagination() { PageSize = 10, PageIndex = 1 });
+                ReturnData tableInfo = t.GetDetail(model.TableID, new Pagination() { pageSize = 10, pageIndex = 1 });
                 DataSet ds = (DataSet)tableInfo.D;
                 string str = ds.Tables[0].Rows[0].ToJson();
                 MyPlatform.Model.Sys_TablesModel table = ModelConverter<MyPlatform.Model.Sys_TablesModel>.ConvertToModelEntity(ds.Tables[0]);

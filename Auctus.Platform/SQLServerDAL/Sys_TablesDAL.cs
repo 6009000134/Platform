@@ -370,8 +370,8 @@ VALUES  ( N'' ,
             try
             {
                 DataSet ds = new DataSet();
-                int startIndex = DALUtils.CalStartIndex(page.PageSize, page.PageIndex);
-                int endIndex = DALUtils.CalEndIndex(page.PageSize, page.PageIndex);
+                int startIndex = DALUtils.CalStartIndex(page.pageSize, page.pageIndex);
+                int endIndex = DALUtils.CalEndIndex(page.pageSize, page.pageIndex);
                 string sql = "select * from sys_tables where ID=@ID;select * from (select ROW_NUMBER() OVER(ORDER BY orderNO)RN,* from sys_columns where tableID=@ID)t where t.rn>" + startIndex.ToString() + " and t.rn<" + endIndex.ToString() + ";select count(1)TotalCount from sys_columns where tableID=@ID";
                 IDataBase db = DBHelperFactory.Create(defaultCon);
                 SqlParameter[] pars = { new SqlParameter("@ID", tableID) };

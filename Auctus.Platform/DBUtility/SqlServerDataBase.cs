@@ -377,25 +377,27 @@ namespace MyPlatform.DBUtility
                                 dt.Rows.Add(dr3);
                                 break;
                             case SqlServerCommandBehavior.ExecuteReader:
-                                using (SqlDataReader sdr = cmd.ExecuteReader())
-                                {
-                                    List<string> names = new List<string>();
-                                    for (int j = 0; j < sdr.FieldCount; j++)
-                                    {
-                                        //names.Add(sdr.GetName(j));
-                                        DataColumn cn = new DataColumn(sdr.GetName(j));
-                                        dt.Columns.Add(cn);
-                                    }
-                                    while (sdr.Read())
-                                    {
-                                        DataRow dr2 = dt.NewRow();
-                                        for (int k = 0; k < sdr.FieldCount; k++)
-                                        {
-                                            dr2[k] = sdr[k];
-                                        }
-                                        dt.Rows.Add(dr2);
-                                    }
-                                }
+                                SqlDataAdapter sda = new SqlDataAdapter(cmd);
+                                sda.Fill(dt);
+                                //using (SqlDataReader sdr = cmd.ExecuteReader())
+                                //{
+                                //    List<string> names = new List<string>();
+                                //    for (int j = 0; j < sdr.FieldCount; j++)
+                                //    {
+                                //        //names.Add(sdr.GetName(j));
+                                //        DataColumn cn = new DataColumn(sdr.GetName(j));
+                                //        dt.Columns.Add(cn);
+                                //    }
+                                //    while (sdr.Read())
+                                //    {
+                                //        DataRow dr2 = dt.NewRow();
+                                //        for (int k = 0; k < sdr.FieldCount; k++)
+                                //        {
+                                //            dr2[k] = sdr[k];
+                                //        }
+                                //        dt.Rows.Add(dr2);
+                                //    }
+                                //}
                                 break;
                             default:
                                 break;

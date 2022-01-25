@@ -35,6 +35,7 @@ namespace MyPlatform.Areas.Basic.Controllers
             }
             return MyResponseMessage.SuccessJson(result);
         }
+        
         public HttpResponseMessage Edit([FromBody]MyPlatform.Model.Sys_MenuModel model)
         {
             ReturnData result = new ReturnData();
@@ -59,6 +60,26 @@ namespace MyPlatform.Areas.Basic.Controllers
             try
             {
                 result = menuBLL.GetMenuTree();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return MyResponseMessage.SuccessJson(result);
+        }
+        /// <summary>
+        /// 获取全部菜单
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public HttpResponseMessage List(dynamic obj)
+        {
+            ReturnData result = new ReturnData();
+            try
+            {
+                Pagination page = JSONUtil.ParseFromJson<Pagination>(obj.page.ToString());
+                List<QueryConditionModel> conditions = JSONUtil.ParseFromJson<List<QueryConditionModel>>(obj.condition.ToString());
+                result = menuBLL.GetList(page,conditions);
             }
             catch (Exception ex)
             {

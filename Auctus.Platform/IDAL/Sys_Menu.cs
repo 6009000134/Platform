@@ -1,5 +1,7 @@
 ﻿using MyPlatform.DBUtility;
+using MyPlatform.Model;
 using System;
+using System.Collections.Generic;
 using System.Data;
 namespace MyPlatform.IDAL
 {
@@ -24,5 +26,7 @@ namespace MyPlatform.IDAL
         /// <param name="db"></param>
         /// <returns></returns>
         bool Edit(MyPlatform.Model.Sys_MenuModel model, IDataBase db);
+
+        DataSet GetList(IDataBase db,Pagination page,List<QueryConditionModel> conditions);
     }
 }
