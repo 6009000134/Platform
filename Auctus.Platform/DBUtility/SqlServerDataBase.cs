@@ -348,68 +348,77 @@ namespace MyPlatform.DBUtility
         public DataSet Query(List<SqlCommandData> list)
         {
             DataSet ds = new DataSet();
-            try
+
+            using (SqlConnection con = new SqlConnection(ConnectionString))
             {
-                using (SqlConnection con = new SqlConnection(ConnectionString))
+                Open(con);
+                using (SqlTransaction tran = con.BeginTransaction())
                 {
-                    SqlCommand cmd = new SqlCommand();
-                    for (int i = 0; i < list.Count; i++)
+                    try
                     {
-                        cmd.Parameters.Clear();
-                        cmd = CreateCommand(list[i].CommandText, list[i].Paras, con);
-                        DataTable dt = new DataTable();
-                        dt.TableName = "data" + (i == 0 ? "" : i.ToString());
-                        switch (list[i].CommandBehavior)
+                        SqlCommand cmd = new SqlCommand();
+                        for (int i = 0; i < list.Count; i++)
                         {
-                            case SqlServerCommandBehavior.ExecuteNonQuery:
-                                int m = cmd.ExecuteNonQuery();
-                                DataColumn dc = new DataColumn("TotalCount");
-                                dt.Columns.Add(dc);
-                                DataRow dr = dt.NewRow();
-                                dr[0] = m;
-                                dt.Rows.Add(dr);
-                                break;
-                            case SqlServerCommandBehavior.ExecuteSclar:
-                                DataColumn dcSclar = new DataColumn("TotalCount");
-                                dt.Columns.Add(dcSclar);
-                                DataRow dr3 = dt.NewRow();
-                                dr3[0]= cmd.ExecuteScalar();
-                                dt.Rows.Add(dr3);
-                                break;
-                            case SqlServerCommandBehavior.ExecuteReader:
-                                SqlDataAdapter sda = new SqlDataAdapter(cmd);
-                                sda.Fill(dt);
-                                //using (SqlDataReader sdr = cmd.ExecuteReader())
-                                //{
-                                //    List<string> names = new List<string>();
-                                //    for (int j = 0; j < sdr.FieldCount; j++)
-                                //    {
-                                //        //names.Add(sdr.GetName(j));
-                                //        DataColumn cn = new DataColumn(sdr.GetName(j));
-                                //        dt.Columns.Add(cn);
-                                //    }
-                                //    while (sdr.Read())
-                                //    {
-                                //        DataRow dr2 = dt.NewRow();
-                                //        for (int k = 0; k < sdr.FieldCount; k++)
-                                //        {
-                                //            dr2[k] = sdr[k];
-                                //        }
-                                //        dt.Rows.Add(dr2);
-                                //    }
-                                //}
-                                break;
-                            default:
-                                break;
+                            cmd.Parameters.Clear();
+                            cmd = CreateCommand(list[i].CommandText, list[i].Paras, con);
+                            cmd.CommandType = list[i].CommandType;
+                            cmd.Transaction = tran;
+                            DataTable dt = new DataTable();
+                            dt.TableName = "data" + (i == 0 ? "" : i.ToString());
+                            switch (list[i].CommandBehavior)
+                            {
+                                case SqlServerCommandBehavior.ExecuteNonQuery:
+                                    int m = cmd.ExecuteNonQuery();
+                                    DataColumn dc = new DataColumn("TotalCount");
+                                    dt.Columns.Add(dc);
+                                    DataRow dr = dt.NewRow();
+                                    dr[0] = m;
+                                    dt.Rows.Add(dr);
+                                    break;
+                                case SqlServerCommandBehavior.ExecuteSclar:
+                                    DataColumn dcSclar = new DataColumn("TotalCount");
+                                    dt.Columns.Add(dcSclar);
+                                    DataRow dr3 = dt.NewRow();
+                                    dr3[0] = cmd.ExecuteScalar();
+                                    dt.Rows.Add(dr3);
+                                    break;
+                                case SqlServerCommandBehavior.ExecuteReader:
+                                    SqlDataAdapter sda = new SqlDataAdapter(cmd);
+                                    sda.Fill(dt);
+                                    //using (SqlDataReader sdr = cmd.ExecuteReader())
+                                    //{
+                                    //    List<string> names = new List<string>();
+                                    //    for (int j = 0; j < sdr.FieldCount; j++)
+                                    //    {
+                                    //        //names.Add(sdr.GetName(j));
+                                    //        DataColumn cn = new DataColumn(sdr.GetName(j));
+                                    //        dt.Columns.Add(cn);
+                                    //    }
+                                    //    while (sdr.Read())
+                                    //    {
+                                    //        DataRow dr2 = dt.NewRow();
+                                    //        for (int k = 0; k < sdr.FieldCount; k++)
+                                    //        {
+                                    //            dr2[k] = sdr[k];
+                                    //        }
+                                    //        dt.Rows.Add(dr2);
+                                    //    }
+                                    //}
+                                    break;
+                                default:
+                                    break;
+                            }
+                            ds.Tables.Add(dt);
                         }
-                        ds.Tables.Add(dt);
+                    }
+                    catch (SqlException ex)
+                    {
+                        throw ex;
                     }
                 }
+
             }
-            catch (SqlException ex)
-            {
-                throw ex;
-            }
+
             return ds;
         }
 

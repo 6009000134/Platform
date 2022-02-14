@@ -40,7 +40,9 @@ namespace MyPlatform.SQLServerDAL
                 // IDataBase db = DBHelperFactory.CreateDBInstance(DBName);
                 if (db.DBType == Model.Enum.DBEnum.SqlServer)//SqlServer
                 {
+                    List<SqlCommandData> li = new List<SqlCommandData>();
                     StringBuilder sb = new StringBuilder();
+                    SqlCommandData scd1 = new SqlCommandData();
                     if (model.Size > 0)
                     {
                         sb.Append("alter table " + model.TableName + " add " + model.ColumnName + " " + model.ColumnType + "(" + model.Size + ")");
@@ -57,11 +59,21 @@ namespace MyPlatform.SQLServerDAL
                     {
                         sb.Append(" not null ");
                     }
+
                     //TODO:增加默认值
-                    if (db.ExecuteNonQuery(sb.ToString()) > 0)
-                    {
-                        result.S = true;
-                    }
+                    scd1.CommandText = sb.ToString();
+                    scd1.Paras = new List<SqlParameter>();
+                    scd1.CommandBehavior = SqlServerCommandBehavior.ExecuteNonQuery;
+                    li.Add(scd1);
+                    SqlCommandData scd2 = new SqlCommandData();
+                    scd2.CommandType = CommandType.StoredProcedure;
+                    scd2.CommandBehavior = SqlServerCommandBehavior.ExecuteNonQuery;
+                    scd2.CommandText = "sp_AddColumnNote";
+                    scd2.Paras = new List<SqlParameter> { new SqlParameter("@TableName", model.TableName), new SqlParameter("@ColumnName", model.ColumnName), new SqlParameter("@Remark", model.Remark) };
+                    li.Add(scd2);
+                    //if (db.ExecuteNonQuery(sb.ToString()) > 0)
+                    db.Query(li);
+                    result.S = true;
                 }
                 else if (db.DBType == Model.Enum.DBEnum.MySql)//MySql
                 {
@@ -128,6 +140,12 @@ VALUES  (
             {
                 throw ex;
             }
+
+        }
+
+        public void AddColumnExtend(string tableName, string columnName, string remark)
+        {
+
 
         }
     }
