@@ -92,9 +92,40 @@ namespace MyPlatform.DBUtility
         /// <param name="paras"></param>
         /// <param name="con"></param>
         /// <returns></returns>
-        public SqlCommand CreateCommand(string sql, List<SqlParameter> paras, SqlConnection con)
+        //public SqlCommand CreateCommand(string sql, List<SqlParameter> paras, SqlConnection con)
+        //{
+        //    SqlCommand cmd = new SqlCommand(sql, con);
+        //    foreach (SqlParameter item in paras)
+        //    {
+        //        if ((item.Direction == ParameterDirection.Input || item.Direction == ParameterDirection.InputOutput) && (item.Value == null))
+        //        {
+        //            item.Value = DBNull.Value;
+        //        }
+        //        cmd.Parameters.Add(item);
+        //    }
+        //    Open(con);
+        //    return cmd;
+        //}
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <param name="sql"></param>
+        /// <param name="paras"></param>
+        /// <param name="con"></param>
+        /// <returns></returns>
+        public void CreateCommand(SqlCommand cmd, SqlConnection con, SqlTransaction trans,CommandType cmdType, string sql, List<SqlParameter> paras)
         {
-            SqlCommand cmd = new SqlCommand(sql, con);
+            //SqlCommand cmd = new SqlCommand(sql, con);
+            Open(con);
+            cmd.Connection = con;
+            cmd.CommandText = sql;
+            cmd.CommandType =cmdType;
+            if (trans != null)
+            {
+                cmd.Transaction = trans;
+            }
             foreach (SqlParameter item in paras)
             {
                 if ((item.Direction == ParameterDirection.Input || item.Direction == ParameterDirection.InputOutput) && (item.Value == null))
@@ -103,8 +134,6 @@ namespace MyPlatform.DBUtility
                 }
                 cmd.Parameters.Add(item);
             }
-            Open(con);
-            return cmd;
         }
         /// <summary>
         /// 创建SqlCommand
@@ -352,17 +381,15 @@ namespace MyPlatform.DBUtility
             using (SqlConnection con = new SqlConnection(ConnectionString))
             {
                 Open(con);
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = con;
                 using (SqlTransaction tran = con.BeginTransaction())
                 {
                     try
                     {
-                        SqlCommand cmd = new SqlCommand();
                         for (int i = 0; i < list.Count; i++)
                         {
-                            cmd.Parameters.Clear();
-                            cmd = CreateCommand(list[i].CommandText, list[i].Paras, con);
-                            cmd.CommandType = list[i].CommandType;
-                            cmd.Transaction = tran;
+                            CreateCommand(cmd, con, tran, list[i].CommandType,list[i].CommandText, list[i].Paras);
                             DataTable dt = new DataTable();
                             dt.TableName = "data" + (i == 0 ? "" : i.ToString());
                             switch (list[i].CommandBehavior)
@@ -409,10 +436,13 @@ namespace MyPlatform.DBUtility
                                     break;
                             }
                             ds.Tables.Add(dt);
+                            cmd.Parameters.Clear();
                         }
+                        tran.Commit();
                     }
                     catch (SqlException ex)
                     {
+                        tran.Rollback();
                         throw ex;
                     }
                 }

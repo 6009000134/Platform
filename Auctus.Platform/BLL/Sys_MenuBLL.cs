@@ -22,6 +22,11 @@ namespace MyPlatform.BLL
             IDataBase db = DBUtility.DBHelperFactory.Create(defaultCon);
             return dal.Add(model, db);
         }
+        public bool Edit(Sys_MenuModel model)
+        {
+            IDataBase db = DBUtility.DBHelperFactory.Create(defaultCon);
+            return dal.Edit(model,db);
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -107,6 +112,16 @@ namespace MyPlatform.BLL
                     }
                 }
             }
+        }
+        /// <summary>
+        /// 获取菜单详情
+        /// </summary>
+        /// <param name="menuID">菜单ID</param>
+        /// <returns></returns>
+        public Sys_MenuModel GetDetailByID(int menuID)
+        {
+            IDataBase db = DBUtility.DBHelperFactory.Create(defaultCon);
+            return dal.GetDetail(db,menuID);
         }
 
     }

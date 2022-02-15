@@ -4,11 +4,17 @@ using System.Collections.Generic;
 using System.Data;
 namespace MyPlatform.Model
 {
-    //Sys_Menu
+    /// <summary>
+    /// 菜单
+    /// </summary>
     public class Sys_MenuModel
     {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public Sys_MenuModel()
         {
+            //Router = new Sys_VueRouterModel();
         }
         /// <summary>
         /// ID
@@ -133,10 +139,25 @@ namespace MyPlatform.Model
             get { return _parentid; }
             set { _parentid = value; }
         }
+        private Sys_VueRouterModel router;
         /// <summary>
         /// 菜单
         /// </summary>
-        public Sys_VueRouterModel Router { get; set; }
+        public Sys_VueRouterModel Router
+        {
+            get
+            {
+                if (router == null)
+                {
+                    router = new Sys_VueRouterModel();
+                }
+                return router;
+            }
+            set
+            {
+                router = value;
+            }
+        }
 
         /// <summary>
         /// 子菜单

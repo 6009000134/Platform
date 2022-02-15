@@ -15,6 +15,34 @@ namespace MyPlatform.SQLServerDAL
         //public MyPlatform.Model.Sys_Menu GetDetailByID(int id)
         //{
         //}
+        public Sys_MenuModel GetDetail(IDataBase db, int menuID)
+        {
+            Sys_MenuModel model = new Sys_MenuModel();
+            string sql = @"SELECT a.ID,a.CreatedBy,a.CreatedDate,a.UpdatedBy,a.UpdatedDate,a.MenuName,a.Uri,a.ParentID,b.ID RouterID,b.Path,b.Name,b.Meta,b.Component,b.MenuID
+FROM dbo.Sys_Menu a LEFT JOIN dbo.Sys_VueRouter b ON a.ID=b.MenuID
+WHERE  a.ID=@MenuID";
+            SqlParameter[] pars = { new SqlParameter("@MenuID", menuID) };
+            DataSet ds = db.Query(sql, pars);
+            for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+            {
+                model.ID = Convert.ToInt32(ds.Tables[0].Rows[i]["ID"]);
+                model.CreatedBy = ds.Tables[0].Rows[i]["CreatedBy"].ToString();
+                model.CreatedDate = Convert.ToDateTime(ds.Tables[0].Rows[i]["CreatedDate"]);
+                model.UpdatedBy = ds.Tables[0].Rows[i]["UpdatedBy"].ToString();
+                model.UpdatedDate = Convert.ToDateTime(ds.Tables[0].Rows[i]["UpdatedDate"]);
+                model.MenuName = ds.Tables[0].Rows[i]["MenuName"].ToString();
+                model.Uri = ds.Tables[0].Rows[i]["Uri"].ToString();
+                model.ParentID = Convert.ToInt32(ds.Tables[0].Rows[i]["ParentID"]);
+                //router info
+                model.Router.ID = Convert.ToInt32(ds.Tables[0].Rows[i]["ParentID"]);
+                model.Router.Path = ds.Tables[0].Rows[i]["Path"].ToString();
+                model.Router.Name = ds.Tables[0].Rows[i]["Name"].ToString();
+                model.Router.Meta = ds.Tables[0].Rows[i]["Meta"].ToString();
+                model.Router.Component = ds.Tables[0].Rows[i]["Component"].ToString();
+                model.Router.MenuID = Convert.ToInt32(ds.Tables[0].Rows[i]["MenuID"]);
+            }
+            return model;
+        }
 
         /// <summary>
         /// 修改菜单

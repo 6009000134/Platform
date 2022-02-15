@@ -35,17 +35,22 @@ namespace MyPlatform.Areas.Basic.Controllers
             }
             return MyResponseMessage.SuccessJson(result);
         }
-        
+        /// <summary>
+        /// 修改菜单信息
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
         public HttpResponseMessage Edit([FromBody]MyPlatform.Model.Sys_MenuModel model)
         {
             ReturnData result = new ReturnData();
             try
             {
-                result.S = true;
+                result.S = menuBLL.Edit(model);
             }
             catch (Exception ex)
             {
-                throw new Exception("修改菜单失败："+ex.Message);
+                throw new Exception("修改菜单失败：" + ex.Message);
             }
             return MyResponseMessage.SuccessJson(result);
         }
@@ -79,10 +84,30 @@ namespace MyPlatform.Areas.Basic.Controllers
             {
                 Pagination page = JSONUtil.ParseFromJson<Pagination>(obj.page.ToString());
                 List<QueryConditionModel> conditions = JSONUtil.ParseFromJson<List<QueryConditionModel>>(obj.condition.ToString());
-                result = menuBLL.GetList(page,conditions);
+                result = menuBLL.GetList(page, conditions);
             }
             catch (Exception ex)
             {
+                throw ex;
+            }
+            return MyResponseMessage.SuccessJson(result);
+        }
+        /// <summary>
+        /// 获取菜单详情
+        /// </summary>
+        /// <param name="menuID">菜单ID</param>
+        /// <returns></returns>
+        [HttpPost]
+        public HttpResponseMessage Detail([FromBody]int menuID)
+        {
+            ReturnData result = new ReturnData();
+            try
+            {
+                result.D = menuBLL.GetDetailByID(menuID);
+                result.S = true;
+            }
+            catch (Exception ex)
+            {                
                 throw ex;
             }
             return MyResponseMessage.SuccessJson(result);
