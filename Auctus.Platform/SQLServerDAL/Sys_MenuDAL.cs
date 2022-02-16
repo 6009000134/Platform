@@ -34,7 +34,7 @@ WHERE  a.ID=@MenuID";
                 model.Uri = ds.Tables[0].Rows[i]["Uri"].ToString();
                 model.ParentID = Convert.ToInt32(ds.Tables[0].Rows[i]["ParentID"]);
                 //router info
-                model.Router.ID = Convert.ToInt32(ds.Tables[0].Rows[i]["ParentID"]);
+                model.Router.ID = Convert.ToInt32(ds.Tables[0].Rows[i]["RouterID"]);
                 model.Router.Path = ds.Tables[0].Rows[i]["Path"].ToString();
                 model.Router.Name = ds.Tables[0].Rows[i]["Name"].ToString();
                 model.Router.Meta = ds.Tables[0].Rows[i]["Meta"].ToString();
@@ -69,7 +69,6 @@ WHERE ID=@ID";
                 new SqlParameter("@UpdatedDate",model.UpdatedDate),
                 new SqlParameter("@MenuName",model.MenuName),
                 new SqlParameter("@Uri",model.Uri),
-                new SqlParameter("@MenuName",model.MenuName),
                 new SqlParameter("@ParentID",model.ParentID),
                 new SqlParameter("@ID",model.ID)
             };
