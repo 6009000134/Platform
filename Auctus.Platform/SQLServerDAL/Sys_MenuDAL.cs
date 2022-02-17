@@ -160,17 +160,24 @@ VALUES  ( @CreatedBy , -- CreatedBy - nvarchar(20)
         }
         public DataSet GetMenuTree(IDataBase db)
         {
-            string sql = @"
-WITH menu(ID,MenuName,ParentID,FullMenuPath) AS
+            string sql = @"WITH menu AS
 (
-SELECT a.ID,a.MenuName,a.ParentID,CAST(a.MenuName  AS VARCHAR(8000))
-FROM dbo.Sys_Menu a WHERE a.ParentID=0
+SELECT a.ID,a.CreatedBy,a.CreatedDate,a.UpdatedBy,a.UpdatedDate,a.MenuName,a.Uri,a.ParentID
+,b.ID RouterID,b.Path,b.Name,b.Meta,b.Component,b.MenuID
+FROM dbo.Sys_Menu a LEFT JOIN dbo.Sys_VueRouter b ON a.ID=b.MenuID
+),
+Result AS
+(
+SELECT a.ID,a.CreatedBy,a.CreatedDate,a.UpdatedBy,a.UpdatedDate,a.MenuName,a.Uri,a.ParentID
+,a.RouterID,a.Path,a.Name,a.Meta,a.Component,a.MenuID,CAST(a.MenuName  AS VARCHAR(8000))FullPath
+FROM menu a WHERE a.ParentID=0
 UNION ALL 
-SELECT b.ID,b.MenuName,b.ParentID,cast (CONVERT(varchar(100),a.FullMenuPath)+'/'+CONVERT(VARCHAR(100),b.MenuName) AS varchar(8000))--,CONVERT(NVARCHAR(MAX),a.FullMenuPath+b.MenuName)
-FROM menu a INNER JOIN dbo.Sys_Menu b ON a.ID=b.ParentID
+SELECT b.ID,b.CreatedBy,b.CreatedDate,b.UpdatedBy,b.UpdatedDate,b.MenuName,b.Uri,b.ParentID
+,b.RouterID,b.Path,b.Name,b.Meta,b.Component,b.MenuID,cast (CONVERT(varchar(100),a.FullPath)+'/'+CONVERT(VARCHAR(100),b.MenuName) AS varchar(8000))
+FROM Result a INNER JOIN menu b ON a.ID=b.ParentID
 )
-SELECT * FROM menu
-order by FullMenuPath
+select * from (SELECT t.*,ROW_NUMBER()OVER(ORDER BY t.FullPath) OrderNo
+FROM Result t) t
 ";
             return db.Query(sql);
         }
@@ -229,13 +236,17 @@ where 1=1 ";
             {
                 foreach (QueryConditionModel item in conditions)
                 {
-                    scd.CommandText += item.Key;
-                    scdTotal.CommandText += item.Key;
-                    switch (item.Operator)
+                    scd.CommandText +=item.LOperator+ item.Key;
+                    scdTotal.CommandText += item.LOperator+ item.Key;
+                    switch (item.Operator.Trim())
                     {
                         case "=":
                             scd.CommandText += " = ";
                             scdTotal.CommandText += " = ";
+                            break;
+                        case "like":
+                            scd.CommandText += " like ";
+                            scdTotal.CommandText += " like ";
                             break;
                         default:
                             scd.CommandText += " " + item.Operator + " ";

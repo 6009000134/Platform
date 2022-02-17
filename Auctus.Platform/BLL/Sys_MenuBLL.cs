@@ -62,6 +62,7 @@ namespace MyPlatform.BLL
                 DataSet ds = dal.GetMenuTree(db);
                 if (ds.Tables[0].Rows.Count > 0)
                 {
+                    GetMenuRecursion(ds.Tables[0], 0, menuLi);
                     DataRow[] drs = ds.Tables[0].Select("ParentID=0");
                     if (drs.Length>0)
                     {
@@ -98,15 +99,19 @@ namespace MyPlatform.BLL
                     foreach (DataRow dr in drs)
                     {
                         Sys_MenuModel menu = new Sys_MenuModel();
-                        //menu.ID = dr["ID"].ToString();
-                        //menu.CreatedBy = dr["CreatedBy"].ToString();
-                        //menu.CreatedDate = dr["CreatedBy"].ToString();
-                        //menu.UpdatedBy = dr["CreatedBy"].ToString();
-                        //menu.UpdatedDate = dr["CreatedBy"].ToString();
-                        //menu.MenuName = dr["CreatedBy"].ToString();
-                        //menu.Uri = dr["CreatedBy"].ToString();
-                        //menu.ParentID = dr["CreatedBy"].ToString();
-                        //menu.vu = dr["CreatedBy"].ToString();                        
+                        menu.ID = Convert.ToInt32(dr["ID"]);
+                        menu.CreatedBy = dr["CreatedBy"].ToString();
+                        menu.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                        menu.UpdatedBy = dr["UpdatedBy"].ToString();
+                        menu.UpdatedDate = Convert.ToDateTime(dr["UpdatedDate"]);
+                        menu.MenuName = dr["MenuName"].ToString();
+                        menu.Uri = dr["Uri"].ToString();
+                        menu.ParentID = Convert.ToInt32(dr["ParentID"]);
+                        menu.Router.ID = Convert.ToInt32(dr["RouterID"]);
+                        menu.Router.MenuID = Convert.ToInt32(dr["MenuID"]);
+                        menu.Router.Meta = dr["Meta"].ToString();
+                        menu.Router.Name = dr["Name"].ToString();
+                        menu.Router.Path = dr["Path"].ToString();
                         li.Add(menu);
                         GetMenuRecursion(dt,menu.ID,li);
                     }

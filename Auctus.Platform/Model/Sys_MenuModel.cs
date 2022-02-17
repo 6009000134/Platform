@@ -159,10 +159,25 @@ namespace MyPlatform.Model
             }
         }
 
+        private List<Sys_MenuModel> childMenu;
         /// <summary>
         /// 子菜单
         /// </summary>
-        public Sys_MenuModel ChildMenu { get; set; }
+        public List<Sys_MenuModel> ChildMenu
+        {
+            get
+            {
+                if (childMenu == null)
+                {
+                    childMenu = new List<Sys_MenuModel>();
+                }
+                return childMenu;
+            }
+            set
+            {
+                childMenu = value;
+            }
+        }
 
     }
 }

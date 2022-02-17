@@ -16,7 +16,7 @@ namespace MyPlatform.Model
         /// </summary>
         public QueryConditionModel()
         {
-            Operator = "=";
+            Operator = " = ";
             LOperator = " And ";
         }
         /// <summary>
