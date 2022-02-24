@@ -300,7 +300,8 @@ namespace MyPlatform.SQLServerDAL
           CreatedBy ,
           CreatedDate) values((SELECT IDENT_CURRENT('Sys_Apis')),@input" + i.ToString();
                         SqlParameter param = new SqlParameter("@input" + i.ToString(), arrInput[i]);
-                        parInput[i % 4] = param;
+                        //parInput[i % 4] = param;
+                        parInput.Add(param);
                     }
                     else if (i % 4 == 3)
                     {
@@ -319,7 +320,8 @@ namespace MyPlatform.SQLServerDAL
                     {
                         sqlInput += ",@input" + i.ToString();
                         SqlParameter param = new SqlParameter("@input" + i.ToString(), arrInput[i]);
-                        parInput[i % 4] = param;
+                        //parInput[i % 4] = param;
+                        parInput.Add(param);
                     }
                 }
                 //保存输出参数信息
@@ -342,7 +344,8 @@ namespace MyPlatform.SQLServerDAL
           CreatedBy ,
           CreatedDate) values((SELECT IDENT_CURRENT('Sys_Apis')),@output" + i.ToString();
                             SqlParameter param = new SqlParameter("@output" + i.ToString(), arrOutput[i]);
-                            parOutput[i % 4] = param;
+                            //parOutput[i % 4] = param;
+                            parOutput.Add(param);
                         }
                         else if (i % 4 == 3)
                         {
@@ -361,7 +364,8 @@ namespace MyPlatform.SQLServerDAL
                         {
                             sqlOutput += ",@output" + i.ToString();
                             SqlParameter param = new SqlParameter("@output" + i.ToString(), arrOutput[i]);
-                            parOutput[i % 4] = param;
+                            parOutput.Add(param);
+                            //parOutput[i % 4] = param;
                         }
                     }
                 }
@@ -380,13 +384,15 @@ namespace MyPlatform.SQLServerDAL
           CreatedBy ,
           CreatedDate)  values((SELECT IDENT_CURRENT('Sys_Apis')),@output" + i.ToString();
                             SqlParameter param = new SqlParameter("@output" + i.ToString(), arrOutput[i]);
-                            parOutput[i % 3] = param;
+                            parOutput.Add(param);
+                            //parOutput[i % 3] = param;
                         }
                         else if (i % 3 == 2)
                         {
                             sqlOutput += ",'',@output" + i.ToString() + "," + (i * 40).ToString() + ",'',getdate())";
                             SqlParameter param = new SqlParameter("@output" + i.ToString(), arrOutput[i]);
-                            parOutput[i % 3] = param;
+                            parOutput.Add(param);
+                            //parOutput[i % 3] = param;
                             SqlCommandData cmdOutput = new SqlCommandData();
                             cmdOutput.CommandText = sqlOutput;
                             cmdOutput.Paras = parOutput;
@@ -399,7 +405,8 @@ namespace MyPlatform.SQLServerDAL
                         {
                             sqlOutput += ",@output" + i.ToString();
                             SqlParameter param = new SqlParameter("@output" + i.ToString(), arrOutput[i]);
-                            parOutput[i % 3] = param;
+                            parOutput.Add(param);
+                            //parOutput[i % 3] = param;
                         }
                     }
                 }
