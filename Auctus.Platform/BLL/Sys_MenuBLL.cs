@@ -72,8 +72,15 @@ namespace MyPlatform.BLL
                             menu.ID = Convert.ToInt32(dr["ID"]);
                             menu.CreatedBy = dr["CreatedBy"].ToString();
                             menu.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                            if (dr["CreatedDate"] != DBNull.Value)
+                            {
+                                menu.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
+                            }
                             menu.UpdatedBy = dr["UpdatedBy"].ToString();
-                            menu.UpdatedDate = Convert.ToDateTime(dr["UpdatedDate"]);
+                            if (dr["UpdatedDate"] != DBNull.Value)
+                            {
+                                menu.UpdatedDate = Convert.ToDateTime(dr["UpdatedDate"]);
+                            }
                             menu.MenuName = dr["MenuName"].ToString();
                             menu.Uri = dr["Uri"].ToString();
                             menu.ParentID = Convert.ToInt32(dr["ParentID"]);
@@ -82,7 +89,7 @@ namespace MyPlatform.BLL
                             menu.Router.Meta = dr["Meta"].ToString();
                             menu.Router.Name = dr["Name"].ToString();
                             menu.Router.Path = dr["Path"].ToString();
-                            GetMenuRecursion2(ds.Tables[0], menu);
+                            GetMenuRecursion(ds.Tables[0], menu);
                             menuLi.Add(menu);
                         }
                     }
@@ -93,11 +100,15 @@ namespace MyPlatform.BLL
             catch (Exception ex)
             {
                 throw ex;
-                throw;
             }
             return result;
         }
-        public void GetMenuRecursion2(DataTable dt, Sys_MenuModel model)
+        /// <summary>
+        /// 递归获取菜单树
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="model"></param>
+        public void GetMenuRecursion(DataTable dt, Sys_MenuModel model)
         {
             if (dt.Rows.Count > 0)
             {
@@ -111,7 +122,10 @@ namespace MyPlatform.BLL
                         menu.CreatedBy = dr["CreatedBy"].ToString();
                         menu.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
                         menu.UpdatedBy = dr["UpdatedBy"].ToString();
-                        menu.UpdatedDate = Convert.ToDateTime(dr["UpdatedDate"]);
+                        if (dr["UpdatedDate"] != DBNull.Value)
+                        {
+                            menu.UpdatedDate = Convert.ToDateTime(dr["UpdatedDate"]);
+                        }
                         menu.MenuName = dr["MenuName"].ToString();
                         menu.Uri = dr["Uri"].ToString();
                         menu.ParentID = Convert.ToInt32(dr["ParentID"]);
@@ -120,38 +134,9 @@ namespace MyPlatform.BLL
                         menu.Router.Meta = dr["Meta"].ToString();
                         menu.Router.Name = dr["Name"].ToString();
                         menu.Router.Path = dr["Path"].ToString();
+                        //menu.ParentMenu = model;
                         model.ChildMenu.Add(menu);
-                        GetMenuRecursion2(dt,menu);
-                    }
-                }
-            }
-        }
-        //TODO:获取菜单
-        public void GetMenuRecursion(DataTable dt, int parentID, List<Sys_MenuModel> li)
-        {
-            if (dt.Rows.Count > 0)
-            {
-                DataRow[] drs = dt.Select("ParentID=" + parentID.ToString());
-                if (drs.Length > 0)
-                {
-                    foreach (DataRow dr in drs)
-                    {
-                        Sys_MenuModel menu = new Sys_MenuModel();
-                        menu.ID = Convert.ToInt32(dr["ID"]);
-                        menu.CreatedBy = dr["CreatedBy"].ToString();
-                        menu.CreatedDate = Convert.ToDateTime(dr["CreatedDate"]);
-                        menu.UpdatedBy = dr["UpdatedBy"].ToString();
-                        menu.UpdatedDate = Convert.ToDateTime(dr["UpdatedDate"]);
-                        menu.MenuName = dr["MenuName"].ToString();
-                        menu.Uri = dr["Uri"].ToString();
-                        menu.ParentID = Convert.ToInt32(dr["ParentID"]);
-                        menu.Router.ID = Convert.ToInt32(dr["RouterID"]);
-                        menu.Router.MenuID = Convert.ToInt32(dr["MenuID"]);
-                        menu.Router.Meta = dr["Meta"].ToString();
-                        menu.Router.Name = dr["Name"].ToString();
-                        menu.Router.Path = dr["Path"].ToString();
-                        li.Add(menu);
-                        GetMenuRecursion(dt, menu.ID, li);
+                        GetMenuRecursion(dt, menu);
                     }
                 }
             }

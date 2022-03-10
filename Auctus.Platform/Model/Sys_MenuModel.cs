@@ -14,7 +14,7 @@ namespace MyPlatform.Model
         /// </summary>
         public Sys_MenuModel()
         {
-            //Router = new Sys_VueRouterModel();
+            //Router = new Sys_VueRouterModel();            
         }
         /// <summary>
         /// ID
@@ -53,14 +53,15 @@ namespace MyPlatform.Model
         {
             get
             {
-                if (_createddate == DateTime.MinValue || _createddate == null)
-                {
-                    return System.Data.SqlTypes.SqlDateTime.MinValue.Value;
-                }
-                else
-                {
-                    return _createddate;
-                }
+                //if (_createddate == DateTime.MinValue || _createddate == null)
+                //{
+                //    return System.Data.SqlTypes.SqlDateTime.MinValue.Value;
+                //}
+                //else
+                //{
+                //    return _createddate;
+                //}
+                return _createddate;
             }
             set { _createddate = value; }
         }
@@ -89,14 +90,15 @@ namespace MyPlatform.Model
         {
             get
             {
-                if (_updateddate == DateTime.MinValue || _updateddate == null)
-                {
-                    return System.Data.SqlTypes.SqlDateTime.MinValue.Value;
-                }
-                else
-                {
-                    return _updateddate;
-                }
+                //if (_updateddate == DateTime.MinValue || _updateddate == null)
+                //{
+                //    return System.Data.SqlTypes.SqlDateTime.MinValue.Value;
+                //}
+                //else
+                //{
+                //    return _updateddate;
+                //}
+                return _updateddate;
             }
             set { _updateddate = value; }
         }
@@ -178,6 +180,26 @@ namespace MyPlatform.Model
                 childMenu = value;
             }
         }
+
+        //private Sys_MenuModel parentMenu { get; set; }
+        ///// <summary>
+        ///// 父菜单
+        ///// </summary>
+        //public Sys_MenuModel ParentMenu
+        //{
+        //    get
+        //    {
+        //        if (parentMenu == null)
+        //        {
+        //            parentMenu = new Sys_MenuModel();
+        //        }
+        //        return parentMenu;
+        //    }
+        //    set
+        //    {
+        //        parentMenu = value;
+        //    }
+        //}
 
     }
 }
