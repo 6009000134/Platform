@@ -10,13 +10,25 @@ using MyPlatform.DBUtility;
 namespace MyPlatform.BLL
 {
     //Sys_Tables
-    public partial class Sys_TablesBLL
+    public partial class Sys_TablesBLL:BLLBase
     {
-        private readonly ISys_Tables dal = DataAccess.CreateInstance<ISys_Tables>("Sys_TablesDAL");
-        private string defaultCon = "Default";
+        //private string defaultCon = "Default";
+        //private readonly ISys_Tables dal = DataAccess.CreateInstance<ISys_Tables>("Sys_TablesDAL");
+        ISys_Tables dal;// = DALFactory.DataAccess.CreateInstance<IQueryObject>("QueryObjectDAL");
+        /// <summary>
+        /// 对应DAL名称
+        /// </summary>
+        //public override string DalName
+        //{
+        //    get
+        //    {
+        //        return "Sys_TablesDAL";
+        //    }
+        //}
         public Sys_TablesBLL()
         {
-
+            //TODO:CreateInstance是否会创建BLLBase的实例
+            dal = this.CreateInstance<ISys_Tables>();
         }
         #region extend
 
@@ -37,7 +49,7 @@ namespace MyPlatform.BLL
 
             //    }
             //    IDataBase acDB = DBHelperFactory.Create(tableInfo.DBCon);
-            //}
+            //}            
             return dal.Delete(tableID);
         }
         public DataTable GetListByDBName(string DBName)
