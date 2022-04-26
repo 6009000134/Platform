@@ -403,11 +403,13 @@ namespace MyPlatform.DBUtility
                                     dt.Rows.Add(dr);
                                     break;
                                 case SqlServerCommandBehavior.ExecuteSclar:
-                                    DataColumn dcSclar = new DataColumn("TotalCount");
-                                    dt.Columns.Add(dcSclar);
-                                    DataRow dr3 = dt.NewRow();
-                                    dr3[0] = cmd.ExecuteScalar();
-                                    dt.Rows.Add(dr3);
+                                    //DataColumn dcSclar = new DataColumn("TotalCount");
+                                    //dt.Columns.Add(dcSclar);
+                                    //DataRow dr3 = dt.NewRow();
+                                    //dr3[0] = cmd.ExecuteScalar();
+                                    //dt.Rows.Add(dr3);
+                                    //TODO:111
+                                    //dt= (DataTable)cmd.ExecuteScalar();
                                     break;
                                 case SqlServerCommandBehavior.ExecuteReader:
                                     SqlDataAdapter sda = new SqlDataAdapter(cmd);

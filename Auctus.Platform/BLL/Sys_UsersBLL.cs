@@ -9,11 +9,24 @@ using MyPlatform.DBUtility;
 
 namespace MyPlatform.BLL
 {
-    public class Sys_UsersBLL
+    public class Sys_UsersBLL: BLLBase
     {
-        private readonly ISys_Users dal = DataAccess.CreateInstance<ISys_Users>("Sys_UsersDAL");
+        private readonly ISys_Users dal;
         //private readonly ISys_Users dal = DataAccess.CreateSysUsers();
-
+        public Sys_UsersBLL()
+        {
+            dal = this.CreateInstance<ISys_Users>();
+        }
+        public bool Edit(Sys_UsersModel model)
+        {
+            IDataBase db = DBHelperFactory.Create(defaultCon);
+            return dal.Edit(db, model);
+        }
+        public Sys_UsersModel GetUserByID(int userID)
+        {
+            IDataBase db = DBHelperFactory.Create(defaultCon);
+            return dal.GetUserByID(db, userID);
+        }
         public MyPlatform.Model.Sys_UsersModel GetModelByAccount(string account)
         {            
             return dal.GetModelByAccount(account);
