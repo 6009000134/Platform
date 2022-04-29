@@ -249,6 +249,7 @@
     <Compile Include="Areas\Web\Controllers\OAController.cs" />
     <Compile Include="Areas\Web\Controllers\QueryController.cs" />
     <Compile Include="Areas\Web\Controllers\RegisterController.cs" />
+    <Compile Include="Areas\Web\Controllers\TodoController.cs" />
     <Compile Include="Areas\Web\WebAreaRegistration.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />

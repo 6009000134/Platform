@@ -58,6 +58,7 @@
     <Compile Include="Sys_TablesBLL.cs" />
     <Compile Include="Sys_UsersBLL.cs" />
     <Compile Include="Sys_VueRouterBLL.cs" />
+    <Compile Include="TodoBLL.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
