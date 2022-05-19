@@ -21,6 +21,7 @@ using Oracle.ManagedDataAccess.Client;
 using System.DirectoryServices;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
+using System.ComponentModel;
 
 namespace ConsoleTest
 {
@@ -40,72 +41,81 @@ namespace ConsoleTest
             //SearchResult result = src.FindOne();
             //Auctus.CustomSV.AP_PayBill.CustPayBill
             //Type[] types = typeof(Auctus.CustomSV.CustFA).Assembly.GetTypes();
-            Type[] types = typeof(Program).Assembly.GetTypes();
-            List<string> li = new List<string>();
-            List<string> li2 = new List<string>();
-            List<string> li3 = new List<string>();
-            for (int i = 0; i < types.Length; i++)
-            {
-                if (types[i].BaseType != null)
+            string s = "";
+            while (s != "3") {
+                s = Console.ReadLine();
+                if (s == "1")
                 {
-                    if (types[i].BaseType.FullName.Contains("H"))
+                    int i = 0;
+                    while (s == "1")
                     {
-                        li.Add(types[i].BaseType.FullName);
+                        i += 1;
+                        if (i <= 5) { 
+                        Send();
                     }
-                    else
-                    {
-                        li2.Add(types[i].BaseType.FullName);
-                    }
+                        if (i > 5) {
+                            break;
+                        }
+                    }                    
                 }
-                else
-                {
-                    li3.Add(types[i].FullName);
+                else if (s == "2") {
+                    SendMailAsync(mailSent);
+               
                 }
-             
-            }
-            Console.WriteLine("工单：");
-            for (int i = 0; i < li.Count; i++)
-            {
-                Console.WriteLine(li[i]);
             }
 
-            Console.WriteLine("非工单");
-            for (int i = 0; i < li2.Count; i++)
-            {
-                Console.WriteLine(li2[i]);
-            }
-            Console.WriteLine("无继承类");
-            for (int i = 0; i < li3.Count; i++)
-            {
-                Console.WriteLine(li3[i]);
-            }
-            Console.ReadLine();
-            decimal a = 0.115m;
-            decimal b = 567;
-            decimal sss = a * b;
-            decimal ss=Math.Round(a*b, 2);
-            decimal ss2=decimal.Round(65.205m, 2, MidpointRounding.AwayFromZero);
-            ClassA ca = new ClassA();
-            ClassB cb = new ClassB();
-            Console.WriteLine(ca.GetType().BaseType);
-            Console.WriteLine(cb.GetType().BaseType);
-            Type t = a.GetType();
-            Console.WriteLine(t.BaseType);
-            Console.WriteLine(t.FullName);
-            Console.WriteLine(t.Name);
-            Console.WriteLine(t.Namespace);
-            Console.WriteLine(t.GetProperties());
+        }
+        private static bool mailSent=false;
+        private static void SendCompletedCallback(object sender, AsyncCompletedEventArgs e)
+        {
+            // Get the unique identifier for this asynchronous operation.
+            String token = (string)e.UserState;
 
-            Console.WriteLine(t.Assembly.FullName);
-            Console.WriteLine(t.Assembly.CodeBase);
-            Console.WriteLine(t.Assembly.Location);
-            AssemblyName an = t.Assembly.GetName();
-            Console.WriteLine(an.CultureName);
-            Console.WriteLine(an.FullName);
-            Console.WriteLine(an.Name);
-            Console.WriteLine(an.Version);
-            Activator.CreateInstance(t);
-            Console.ReadLine();
+            if (e.Cancelled)
+            {
+                Console.WriteLine("[{0}] Send canceled.", token);
+            }
+            if (e.Error != null)
+            {
+                Console.WriteLine("[{0}] {1}", token, e.Error.ToString());
+            }
+            else
+            {
+                Console.WriteLine("Message sent.");
+            }
+            mailSent = true;
+        }
+        public static void Send()
+        {
+            MyPlatform.Common.Mail.MailHelper mailHelper = new MyPlatform.Common.Mail.MailHelper();
+            mailHelper.config.From = new System.Net.Mail.MailAddress("sys_sup@auctus.cn", "深圳力同芯科技发展有限公司");
+            mailHelper.config.Email = "sys_sup@auctus.cn";
+            mailHelper.config.Password = "Qwelsy@1234";
+            mailHelper.config.Host = "192.168.1.1";
+            mailHelper.config.IsBodyHtml = "true";
+            mailHelper.config.To.Add("491675469@qq.com");
+            mailHelper.config.Subject = "测试";
+            mailHelper.config.Body = "<h1>测试邮件</h1>";
+            mailHelper.SendMail();
+        }
+        public static void SendMailAsync(object o)
+        {
+            MyPlatform.Common.Mail.MailHelper mailHelper = new MyPlatform.Common.Mail.MailHelper();
+            mailHelper.config.From = new System.Net.Mail.MailAddress("sys_sup@auctus.cn", "深圳力同芯科技发展有限公司");
+            mailHelper.config.Email = "sys_sup@auctus.cn";
+            mailHelper.config.Password = "Qwelsy@1234";
+            mailHelper.config.Host = "192.168.1.1";
+            mailHelper.config.IsBodyHtml = "true";
+            mailHelper.config.To.Add("491675469@qq.com");
+            mailHelper.config.Subject = "测试";
+            mailHelper.config.Body = "<h1>测试邮件Async</h1>";
+            mailHelper.SendMailAsync(SendCompletedCallback,"subject");
+            Console.WriteLine("输入c开头，撤销邮件发送");
+            string isCancel = Console.ReadLine();
+            if (isCancel == "c")
+            {
+                mailHelper.SendAsyncCancel();
+            }
         }
         public static string GetJson<T>(T obj)
         {
