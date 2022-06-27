@@ -34,9 +34,8 @@ namespace MyPlatform.Filter
             {                
                 token = iToken.First();
                 //TODO:校验token，获取token
-                bool TokenIsEffection = true;
-                
-                if (TokenIsEffection)
+                Dictionary<string, object> validateResult = Common.JWTTokenHelper.ValidateToken(token);
+                if (Convert.ToBoolean(validateResult["S"]))
                 {                    
                     //TODO: 验证是否有权限
                     bool IsAuthorized = true;
@@ -52,7 +51,7 @@ namespace MyPlatform.Filter
                 }
                 else
                 {
-                    actionContext.Response = MyPlatform.Utils.MyResponseMessage.UnAuthorized("Token无效，请重新登录或联系管理员！");
+                    actionContext.Response = MyPlatform.Utils.MyResponseMessage.UnAuthorized(validateResult["M"].ToString());
                 }
             }
             else

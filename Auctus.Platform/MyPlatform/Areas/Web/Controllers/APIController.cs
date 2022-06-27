@@ -128,17 +128,17 @@ namespace MyPlatform.Areas.Web.Controllers
                     case "daily":
                         DataTable dt = bll.GetNoDataCalendar("SSE");
                         int colNum = 2000;
-                        DataSet ds=SplitDataTable(dt, colNum);
+                        DataSet ds = SplitDataTable(dt, colNum);
                         int tableNum = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(dt.Rows.Count) / Convert.ToDouble(colNum)));
                         ThreadPool.SetMaxThreads(5, 20);
                         object o = new object();
                         for (int i = 0; i < ds.Tables.Count; i++)
                         {
                             Dictionary<string, object> dicObj = new Dictionary<string, object>();
-                            dicObj.Add("dt",ds.Tables[i]);
-                            dicObj.Add("apiID",apiID);
+                            dicObj.Add("dt", ds.Tables[i]);
+                            dicObj.Add("apiID", apiID);
                             dicObj.Add("url", url);
-                            dicObj.Add("ID", "Thread-2021-"+i.ToString());
+                            dicObj.Add("ID", "Thread-2021-" + i.ToString());
                             //if (i==0)
                             //{
                             //    InsertDailyList(dicObj);
@@ -156,6 +156,19 @@ namespace MyPlatform.Areas.Web.Controllers
                     default:
                         apiResult = Post(url, body);
                         result.S = InsertApiResult(apiResult, apiID);
+                        while (apiResult.data!=null&&apiResult.data.has_more)
+                        {
+                            Dictionary<string, object> dic = JSONUtil.ParseFromJson<Dictionary<string, object>>(body);
+                            //Dictionary<string, object> dicPara = dic["params"];
+                            Dictionary<string, object> dicPara = JSONUtil.ParseFromJson<Dictionary<string, object>>(dic["params"].ToString());
+                            dicPara.Add("offset", apiResult.data.items.Count);
+                            dicPara.Add("limit", 15000);
+                            dic["params"] = dicPara;
+                            body = dic.ToJson();
+                            apiResult = Post(url, body);
+                            result.S = InsertApiResult(apiResult, apiID);
+                        }
+                        //Dictionary<string, string> dic2 = JSONUtil.ParseFromJson<Dictionary<string, object>>(); ;
                         break;
                 }
             }
@@ -181,7 +194,7 @@ namespace MyPlatform.Areas.Web.Controllers
                         for (int j = i * colNum; j < (i + 1) * colNum; j++)
                         {
                             dtArr[i].ImportRow(dt.Rows[j]);
-                        }                      
+                        }
                     }
                     else
                     {
@@ -212,9 +225,9 @@ namespace MyPlatform.Areas.Web.Controllers
                 dic.Add("ts_code", "");
                 dic.Add("start_date", "");
                 dic.Add("end_date", "");
-                Common.LogHelper.Default.WriteInfo("Thread:"+threadID);
+                Common.LogHelper.Default.WriteInfo("Thread:" + threadID);
                 APIInputParamModel inputParam = CreateInputStr(apiID, dic);
-                TuShareResult tempResult = MultiPost(url, inputParam.ToJson<APIInputParamModel>(),threadID);
+                TuShareResult tempResult = MultiPost(url, inputParam.ToJson<APIInputParamModel>(), threadID);
                 if (tempResult.data.items.Count > 0)
                 {
                     result.S = InsertApiResult(tempResult, apiID);
@@ -228,10 +241,10 @@ namespace MyPlatform.Areas.Web.Controllers
             {
                 throw new Exception("API接口无数据返回");
             }
-            else if (result.data.has_more)
-            {
-                throw new Exception("未获取到全部数据");
-            }
+            //else if (result.data.has_more)
+            //{
+            //    throw new Exception("未获取到全部数据");
+            //}
             return bll.GetApiResult(result, apiID).S;
         }
         /// <summary>
@@ -603,7 +616,7 @@ namespace MyPlatform.Areas.Web.Controllers
         public TuShareResult Post(string url, string body)
         {
             HttpHelper hh = new HttpHelper();
-            string result = HttpUtility.UrlDecode(hh.Post(url, body));          
+            string result = HttpUtility.UrlDecode(hh.Post(url, body));
             TuShareResult apiResult = JSONUtil.ParseFromJson<TuShareResult>(result);
             if (apiResult.code == "40203")
             {
@@ -624,7 +637,7 @@ namespace MyPlatform.Areas.Web.Controllers
         /// <param name="body"></param>
         /// <param name="threadID"></param>
         /// <returns></returns>
-        public TuShareResult MultiPost(string url, string body,string threadID)
+        public TuShareResult MultiPost(string url, string body, string threadID)
         {
             HttpHelper hh = new HttpHelper();
             string result = HttpUtility.UrlDecode(hh.Post(url, body));
@@ -632,7 +645,7 @@ namespace MyPlatform.Areas.Web.Controllers
             if (apiResult.code == "40203")
             {
                 Common.LogHelper.Default.WriteError("Thread:" + threadID);
-                Common.LogHelper.Default.WriteError("Fail:"+ result);
+                Common.LogHelper.Default.WriteError("Fail:" + result);
                 apiResult = Post(url, body);
             }
             else
