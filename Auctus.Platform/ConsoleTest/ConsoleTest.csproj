@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CRMUtility">
+      <HintPath>..\..\..\..\..\MES4OaAndU9\Mes4OaAndU9\CRMUtility\bin\Debug\CRMUtility.dll</HintPath>
+    </Reference>
     <Reference Include="JWT, Version=7.0.0.0, Culture=neutral, PublicKeyToken=6f98bca0f40f2ecf, processorArchitecture=MSIL">
       <HintPath>..\packages\JWT.7.2.0\lib\net40\JWT.dll</HintPath>
       <Private>True</Private>
@@ -58,6 +61,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UFIDA.U9.CBO.PubBE">
+      <HintPath>..\..\..\..\..\..\..\yonyou\Portal\ApplicationServer\Libs\UFIDA.U9.CBO.PubBE.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustPayBill.cs" />

@@ -41,7 +41,7 @@ namespace MyPlatform.Areas.Web.Controllers
                 Dictionary<string, object> dicPayload = new Dictionary<string, object>();
                 dicPayload.Add("Account", user.Account);
                 dicPayload.Add("UserName", user.UserName);
-                token = Common.JWTTokenHelper.GenerateToken(dicPayload, Common.JWTTokenHelper.SetTimeOut(1));
+                token = Common.JWTTokenHelper.GenerateToken(dicPayload, Common.JWTTokenHelper.SetTimeOut(1000));
             }
             else
             {

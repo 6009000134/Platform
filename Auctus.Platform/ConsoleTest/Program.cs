@@ -22,6 +22,8 @@ using System.DirectoryServices;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json;
 using System.ComponentModel;
+using CRMUtility;
+using UFIDA.U9.CBO.PubBE.YYC;
 
 namespace ConsoleTest
 {
@@ -30,6 +32,14 @@ namespace ConsoleTest
     {
         static void Main(string[] args)
         {
+            decimal d = new decimal(123.00000);
+            string s = d.ToString("N");
+            List<string> li = new List<string>();
+            li.Add("aa");
+            li.Add("bb");
+            li.Add("cc");
+            Console.WriteLine(li.ToString());
+            Console.ReadLine();
             //域登录
             //string userAccount = "liufei";
             //DirectoryEntry du = new DirectoryEntry(@"LDAP://auctus.cn", userAccount, "Qwelsy@123");
@@ -42,35 +52,25 @@ namespace ConsoleTest
             //Auctus.CustomSV.AP_PayBill.CustPayBill
             //Type[] types = typeof(Auctus.CustomSV.CustFA).Assembly.GetTypes();
 
-            /*
-         1、根据view查询constring
-         2、获取db operator
-         */
-            DataTable dt = new DataTable();
-            DataColumn dc = new DataColumn("ID");
-            DataColumn dc2 = new DataColumn("ID2");
-            dt.Columns.Add(dc);
-            dt.Columns.Add(dc2);
-            for (int i = 0; i < 10; i++)
-            {
-                DataRow dr = dt.NewRow();
-                dr[0] = i;
-                dr[1] = i * 10;
-                dt.Rows.Add(dr);
-            }
-            for (int i = 0; i < 10; i++)
-            {
-                DataRow dr = dt.NewRow();
-                dr[0] = i;
-                dr[1] = i * 10;
-                dt.Rows.Add(dr);
-            }
-            DataTable dt2 = dt.AsDataView().ToTable(true, "ID");
+
+            //Dictionary<string, string> dicToken = CRMUtils.GetToken();
+            //Dictionary<string, object> dicParam = CRMUtils.SetBaseParam(dicToken);
+            //dicParam.Add("apiName", "AccountObj");
+            //dicParam.Add("includeDetail", false);
+            //string result= CRMUtils.Post("https://open.fxiaoke.com/cgi/crm/v2/object/describe", dicParam.ToJson());
+            //Dictionary<string, object> dicResult = JSONUtil.ParseFromJson<Dictionary<string,object>>(result);
+            //Dictionary<string,object> dicData= JSONUtil.ParseFromJson<Dictionary<string, object>>(dicResult["data"].ToString());
+            //Dictionary<string,object> dicData2= JSONUtil.ParseFromJson<Dictionary<string, object>>(dicData["describe"].ToString());
+            //Dictionary<string, object> dicData3 = JSONUtil.ParseFromJson<Dictionary<string, object>>(dicData2["fields"].ToString());
+            //Dictionary<string, object> dicData4 = JSONUtil.ParseFromJson<Dictionary<string, object>>(dicData3["UDSSel3__c"].ToString());
+            //List<Dictionary<string,string>> dicData5 = JSONUtil.ParseFromJson<List<Dictionary<string, string>>>(dicData4["options"].ToString());
 
             //Console.WriteLine("请输入视图名称：");
             //string con1 = Console.ReadLine();
             //DBHelper helper=DALAccess.GetDB(con1);
             //helper.Execute();
+
+
         }
     }
     public class DBHelper
