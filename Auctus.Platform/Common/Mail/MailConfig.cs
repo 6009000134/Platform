@@ -9,6 +9,15 @@ namespace MyPlatform.Common.Mail
 {
     public class MailConfig
     {
+        public MailConfig()
+        {
+            To = new ArrayList();
+            CC = new ArrayList();
+            Bcc = new ArrayList();
+            SubjectEncoding = Encoding.UTF8;
+            BodyEncoding = Encoding.UTF8;
+            Attachments = new List<string>();
+        }
         /// <summary>
         /// 用于 SMTP 事务的主机的名称或 IP 地址
         /// </summary>

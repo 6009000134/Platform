@@ -10,9 +10,24 @@ using System.Threading.Tasks;
 
 namespace MyPlatform.BLL
 {
-    public class QueryBLL
+    public class QueryBLL : BLLBase
     {
-        IQueryObject dal = DALFactory.DataAccess.CreateInstance<IQueryObject>("QueryObjectDAL");
+        IQueryObject dal;// = DALFactory.DataAccess.CreateInstance<IQueryObject>("QueryObjectDAL");
+        /// <summary>
+        /// 对应DAL名称
+        /// </summary>
+        public override string DalName
+        {
+            get
+            {
+                return "QueryObjectDAL";
+            }
+        }
+        public QueryBLL()
+        {
+            //TODO:CreateInstance是否会创建BLLBase的实例
+            dal = this.CreateInstance<IQueryObject>();
+        }
         /// <summary>
         /// 查询“查询视图”数据集
         /// </summary>

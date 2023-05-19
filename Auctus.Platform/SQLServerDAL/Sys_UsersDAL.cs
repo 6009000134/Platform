@@ -14,6 +14,31 @@ namespace MyPlatform.SQLServerDAL
     public partial class Sys_UsersDAL : ISys_Users
     {
         string dbCon = "Default";
+        /// <summary>
+        /// 编辑用户信息
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public bool Edit(IDataBase db, Sys_UsersModel model)
+        {
+            string sql = "update sys_users set UserName=@UserName,UpdatedBy=@UpdatedBy,UpdatedDate=GetDate() where ID=@ID";
+            SqlParameter[] pars = { new SqlParameter("@UserName", model.UserName), new SqlParameter("@UpdatedBy", model.UpdatedBy), new SqlParameter("@ID", model.ID) };
+            return db.ExecuteNonQuery(sql, pars) > 0;
+        }
+        /// <summary>
+        /// 根据用户ID获取用户信息
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        public Sys_UsersModel GetUserByID(IDataBase db, int userID)
+        {
+            Sys_UsersModel user = new Sys_UsersModel();
+            string sql = "select * from Sys_Users where ID=@ID ";
+            SqlParameter[] pars = { new SqlParameter("@ID", userID) };
+            return ModelConverter<Sys_UsersModel>.ConvertToModelEntity(db.Query(sql, pars).Tables[0]);
+        }
 
         public DataSet GetList(List<Dictionary<string, string>> condition, Pagination page)
         {
@@ -29,8 +54,8 @@ FROM dbo.Sys_Users a Where 1=1 ";
             {
                 if (item.ContainsKey("UserName"))
                 {
-                    sqlCondition += " AND UserName=@UserName";
-                    SqlParameter par = new SqlParameter("@UserName", item["UserName"]);
+                    sqlCondition += " AND patindex(@UserName,UserName)>0";
+                    SqlParameter par = new SqlParameter("@UserName", '%'+item["UserName"]+'%');
                     pars.Add(par);
                 }
                 if (item.ContainsKey("Account"))
@@ -40,19 +65,19 @@ FROM dbo.Sys_Users a Where 1=1 ";
                     pars.Add(par);
                 }
             }
-            
-            sql += sqlCondition+" ) t WHERE t.RN>" + beginIndex.ToString() + " AND t.RN<" + endIndex.ToString();
+
+            sql += sqlCondition + " ) t WHERE t.RN>" + beginIndex.ToString() + " AND t.RN<" + endIndex.ToString();
 
             string sqlCount = @"SELECT Count(1)TotalCount 
-FROM dbo.Sys_Users a Where 1=1 "+sqlCondition;
-            
+FROM dbo.Sys_Users a Where 1=1 " + sqlCondition;
+
             IDataBase db = new SqlServerDataBase(dbCon);
             SqlCommandData scd = new SqlCommandData();
             scd.CommandBehavior = SqlServerCommandBehavior.ExecuteReader;
             scd.CommandText = sql;
             scd.Paras = pars;
             SqlCommandData scd2 = new SqlCommandData();
-            scd2.CommandBehavior = SqlServerCommandBehavior.ExecuteSclar;
+            scd2.CommandBehavior = SqlServerCommandBehavior.ExecuteReader;
             scd2.CommandText = sqlCount;
             scd2.Paras = pars;
             //scd.CommandBehavior = SqlServerCommandBehavior.ExecuteSclar;

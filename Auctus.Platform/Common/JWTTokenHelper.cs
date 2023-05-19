@@ -65,7 +65,7 @@ namespace MyPlatform.Common
                 IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();
                 IJwtAlgorithm algorithm = new HMACSHA256Algorithm(); // symmetric
                 IJwtDecoder decoder = new JwtDecoder(serializer, validator, urlEncoder, algorithm);
-                var json = decoder.Decode(token, secret, verify: true);                
+                var json = decoder.Decode(token, secret, verify: true);
                 result.Add("S", true);
                 result.Add("M", "");
             }

@@ -4,11 +4,17 @@ using System.Collections.Generic;
 using System.Data;
 namespace MyPlatform.Model
 {
-    //Sys_Menu
+    /// <summary>
+    /// 菜单
+    /// </summary>
     public class Sys_MenuModel
     {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public Sys_MenuModel()
         {
+            //Router = new Sys_VueRouterModel();            
         }
         /// <summary>
         /// ID
@@ -47,14 +53,15 @@ namespace MyPlatform.Model
         {
             get
             {
-                if (_createddate == DateTime.MinValue || _createddate == null)
-                {
-                    return System.Data.SqlTypes.SqlDateTime.MinValue.Value;
-                }
-                else
-                {
-                    return _createddate;
-                }
+                //if (_createddate == DateTime.MinValue || _createddate == null)
+                //{
+                //    return System.Data.SqlTypes.SqlDateTime.MinValue.Value;
+                //}
+                //else
+                //{
+                //    return _createddate;
+                //}
+                return _createddate;
             }
             set { _createddate = value; }
         }
@@ -83,14 +90,15 @@ namespace MyPlatform.Model
         {
             get
             {
-                if (_updateddate == DateTime.MinValue || _updateddate == null)
-                {
-                    return System.Data.SqlTypes.SqlDateTime.MinValue.Value;
-                }
-                else
-                {
-                    return _updateddate;
-                }
+                //if (_updateddate == DateTime.MinValue || _updateddate == null)
+                //{
+                //    return System.Data.SqlTypes.SqlDateTime.MinValue.Value;
+                //}
+                //else
+                //{
+                //    return _updateddate;
+                //}
+                return _updateddate;
             }
             set { _updateddate = value; }
         }
@@ -133,10 +141,65 @@ namespace MyPlatform.Model
             get { return _parentid; }
             set { _parentid = value; }
         }
+        private Sys_VueRouterModel router;
         /// <summary>
         /// 菜单
         /// </summary>
-        public Sys_VueRouterModel Router { get; set; }
+        public Sys_VueRouterModel Router
+        {
+            get
+            {
+                if (router == null)
+                {
+                    router = new Sys_VueRouterModel();
+                }
+                return router;
+            }
+            set
+            {
+                router = value;
+            }
+        }
+
+        private List<Sys_MenuModel> childMenu;
+        /// <summary>
+        /// 子菜单
+        /// </summary>
+        public List<Sys_MenuModel> ChildMenu
+        {
+            get
+            {
+                if (childMenu == null)
+                {
+                    childMenu = new List<Sys_MenuModel>();
+                }
+                return childMenu;
+            }
+            set
+            {
+                childMenu = value;
+            }
+        }
+
+        //private Sys_MenuModel parentMenu { get; set; }
+        ///// <summary>
+        ///// 父菜单
+        ///// </summary>
+        //public Sys_MenuModel ParentMenu
+        //{
+        //    get
+        //    {
+        //        if (parentMenu == null)
+        //        {
+        //            parentMenu = new Sys_MenuModel();
+        //        }
+        //        return parentMenu;
+        //    }
+        //    set
+        //    {
+        //        parentMenu = value;
+        //    }
+        //}
 
     }
 }

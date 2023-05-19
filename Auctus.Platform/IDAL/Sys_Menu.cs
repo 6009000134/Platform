@@ -1,5 +1,7 @@
 ﻿using MyPlatform.DBUtility;
+using MyPlatform.Model;
 using System;
+using System.Collections.Generic;
 using System.Data;
 namespace MyPlatform.IDAL
 {
@@ -24,5 +26,14 @@ namespace MyPlatform.IDAL
         /// <param name="db"></param>
         /// <returns></returns>
         bool Edit(MyPlatform.Model.Sys_MenuModel model, IDataBase db);
+
+        DataSet GetList(IDataBase db,Pagination page,List<QueryConditionModel> conditions);
+        /// <summary>
+        /// 获取菜单详情
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="menuID">菜单ID</param>
+        /// <returns></returns>
+        Sys_MenuModel GetDetail(IDataBase db, int menuID);
     }
 }

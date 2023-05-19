@@ -23,6 +23,11 @@ namespace MyPlatform.Filter
             //base.OnAuthorization(actionContext);
             //return;
             // 对AllowAnonymousAttribute的Action不进行校验
+            string s = actionContext.RequestContext.Url.Request.Headers.Referrer.ToString();
+            string ss = actionContext.Request.Headers.Referrer.ToString();
+            string sss=actionContext.Request.Headers.Referrer.AbsolutePath;
+            string ssss = actionContext.Request.Headers.Referrer.AbsoluteUri;
+            Uri u = actionContext.Request.Headers.Referrer;
             if (actionContext.ActionDescriptor.GetCustomAttributes<AllowAnonymousAttribute>().Any())
             {
                 return;
@@ -31,15 +36,17 @@ namespace MyPlatform.Filter
             string token = "";
             IEnumerable<string> iToken;
             if (actionContext.Request.Headers.TryGetValues("Token", out iToken))
-            {                
+            {
+                //TODO:可以设置访问白名单或者所有用户添加访问权限
+
                 token = iToken.First();
                 //TODO:校验token，获取token
-                bool TokenIsEffection = true;
-                
-                if (TokenIsEffection)
+                Dictionary<string, object> validateResult = Common.JWTTokenHelper.ValidateToken(token);
+                if (Convert.ToBoolean(validateResult["S"]))
                 {                    
                     //TODO: 验证是否有权限
                     bool IsAuthorized = true;
+                    
                     if (IsAuthorized)
                     {
                         //actionContext.ControllerContext.Request.Properties
@@ -52,7 +59,7 @@ namespace MyPlatform.Filter
                 }
                 else
                 {
-                    actionContext.Response = MyPlatform.Utils.MyResponseMessage.UnAuthorized("Token无效，请重新登录或联系管理员！");
+                    actionContext.Response = MyPlatform.Utils.MyResponseMessage.UnAuthorized(validateResult["M"].ToString());
                 }
             }
             else

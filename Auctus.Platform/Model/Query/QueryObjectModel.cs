@@ -16,7 +16,7 @@ namespace MyPlatform.Model
         /// </summary>
         public QueryObjectModel()
         {
-            PageInfo = new Pagination { PageSize = 10, PageIndex = 1 };
+            PageInfo = new Pagination { pageSize = 10, pageIndex = 1 };
             Detail = new List<QueryObjectDetail>();
         }
         /// <summary>

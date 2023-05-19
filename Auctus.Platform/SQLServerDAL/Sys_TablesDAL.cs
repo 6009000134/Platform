@@ -279,7 +279,7 @@ VALUES  ( N'' ,
         {
             List<SqlCommandData> sqlCommands = new List<SqlCommandData>();//事务参数
             IDataBase dbDefault = DBHelperFactory.Create(defaultCon);
-            SqlCommandData sc2 = SqlFactory.CreateInsertSqlByRef<MyPlatform.Model.Sys_TablesModel>(model);
+            SqlCommandData sc2 = SqlFactory.CreateInsertSqlByRefTable<MyPlatform.Model.Sys_TablesModel>(model,"Sys_Tables");
             sqlCommands.Add(sc2);
             //dbDefault.ExecuteTran(sqlCommands);
             //sqlCommands = new List<SqlCommandData>();
@@ -370,8 +370,8 @@ VALUES  ( N'' ,
             try
             {
                 DataSet ds = new DataSet();
-                int startIndex = DALUtils.CalStartIndex(page.PageSize, page.PageIndex);
-                int endIndex = DALUtils.CalEndIndex(page.PageSize, page.PageIndex);
+                int startIndex = DALUtils.CalStartIndex(page.pageSize, page.pageIndex);
+                int endIndex = DALUtils.CalEndIndex(page.pageSize, page.pageIndex);
                 string sql = "select * from sys_tables where ID=@ID;select * from (select ROW_NUMBER() OVER(ORDER BY orderNO)RN,* from sys_columns where tableID=@ID)t where t.rn>" + startIndex.ToString() + " and t.rn<" + endIndex.ToString() + ";select count(1)TotalCount from sys_columns where tableID=@ID";
                 IDataBase db = DBHelperFactory.Create(defaultCon);
                 SqlParameter[] pars = { new SqlParameter("@ID", tableID) };

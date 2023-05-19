@@ -30,38 +30,26 @@ namespace MyPlatform.Areas.Web.Controllers
             ActionContext.Request.Headers.TryGetValues("Token", out iToken);
             string token = iToken == null ? "" : iToken.First();
             HttpResponseMessage rep = new HttpResponseMessage();
-            bool isTokenEffective = false;
-            if (!string.IsNullOrEmpty(token))//有token，校验token正确性
+
+            if (userBLL.Exists(model))//校验用户账号密码
             {
-                Dictionary<string, object> validateResult = Common.JWTTokenHelper.ValidateToken(token);
-                if (Convert.ToBoolean(validateResult["S"]))
-                {
-                    isTokenEffective = true;
-                }
+                //TODO:       2、获取用户权限，将token和权限键值对缓存 3、将菜单目录、权限返回前端                
+                result.S = true;
+                MyPlatform.Model.Sys_UsersModel user = userBLL.GetModelByAccount(model.Account);
+                result.D = user;
+                //生成Token
+                Dictionary<string, object> dicPayload = new Dictionary<string, object>();
+                dicPayload.Add("Account", user.Account);
+                dicPayload.Add("UserName", user.UserName);
+                token = Common.JWTTokenHelper.GenerateToken(dicPayload, Common.JWTTokenHelper.SetTimeOut(1000));
             }
-            //Token不存在或者失效
-            if (!isTokenEffective)
+            else
             {
-                if (userBLL.Exists(model))//校验用户账号密码
-                {
-                    //TODO:       2、获取用户权限，将token和权限键值对缓存 3、将菜单目录、权限返回前端                
-                    result.S = true;
-                    MyPlatform.Model.Sys_UsersModel user = userBLL.GetModelByAccount(model.Account);
-                    result.D = user;
-                    //生成Token
-                    Dictionary<string, object> dicPayload = new Dictionary<string, object>();
-                    dicPayload.Add("Account", user.Account);
-                    dicPayload.Add("UserName", user.UserName);
-                    token = Common.JWTTokenHelper.GenerateToken(dicPayload, Common.JWTTokenHelper.SetTimeOut(1));
-                }
-                else
-                {
-                    result.SetErrorMsg("账号/密码错误！");
-                }
-                rep = MyPlatform.Utils.MyResponseMessage.SuccessJson(result);
-                rep.Headers.Add("Access-Control-Expose-Headers", "Token");
-                rep.Headers.Add("Token", token);
+                result.SetErrorMsg("账号/密码错误！");
             }
+            rep = MyPlatform.Utils.MyResponseMessage.SuccessJson(result);
+            rep.Headers.Add("Access-Control-Expose-Headers", "Token");
+            rep.Headers.Add("Token", token);
             return rep;
         }
         //TODO:校验token过期时，通过refresh_token刷新是否存在bug

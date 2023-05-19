@@ -5,21 +5,21 @@
     <DBName>CMS</DBName>
     <DBType>0</DBType>
     <DBTypeCode>SqlServer</DBTypeCode>
-    <ConnectionString>Data Source=192.168.11.27;Initial Catalog=CMS;User ID=sa;Password=123456</ConnectionString>
+    <ConnectionString>Data Source=192.168.11.92;Initial Catalog=CMS;User ID=sa;Password=123456</ConnectionString>
   </DB>
   <DB>
     <DBCon>SqlDB</DBCon>
     <DBName>CRMSystem</DBName>
     <DBType>1</DBType>
     <DBTypeCode>SqlServer</DBTypeCode>
-    <ConnectionString>Data Source=192.168.11.27;Initial Catalog=CRMSystem;User ID=sa;Password=123456</ConnectionString>
+    <ConnectionString>Data Source=192.168.11.92;Initial Catalog=CRMSystem;User ID=sa;Password=123456</ConnectionString>
   </DB>
   <DB>
     <DBCon>DiaryCon</DBCon>
     <DBName>Diary</DBName>
     <DBType>1</DBType>
     <DBTypeCode>SqlServer</DBTypeCode>
-    <ConnectionString>Data Source=192.168.11.27;Initial Catalog=Diary;User ID=sa;Password=123456</ConnectionString>
+    <ConnectionString>Data Source=192.168.11.92;Initial Catalog=Diary;User ID=sa;Password=123456</ConnectionString>
   </DB>
   <DB>
     <DBCon>MySqlCon</DBCon>

@@ -17,7 +17,7 @@ namespace MyPlatform.SQLServerDAL
         /// <returns></returns>
         public static int CalStartIndex(Pagination page)
         {
-            return page.PageSize * (page.PageIndex - 1);
+            return page.pageSize * (page.pageIndex - 1);
         }
         /// <summary>
         /// 计算结尾页码
@@ -26,7 +26,7 @@ namespace MyPlatform.SQLServerDAL
         /// <returns></returns>
         public static int CalEndIndex(Pagination page)
         {
-            return page.PageSize * page.PageIndex + 1;
+            return page.pageSize * page.pageIndex + 1;
         }
         /// <summary>
         /// 计算开始页码

@@ -2,6 +2,7 @@
 using System.Data;
 using MyPlatform.Model;
 using System.Collections.Generic;
+using MyPlatform.DBUtility;
 
 namespace MyPlatform.IDAL
 {
@@ -33,7 +34,27 @@ namespace MyPlatform.IDAL
         /// 增加一条数据
         /// </summary>
         int Add(MyPlatform.Model.Sys_UsersModel model);
+        /// <summary>
+        /// 获取用户列表
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
         DataSet GetList(List<Dictionary<string, string>> condition, Pagination page);
+        /// <summary>
+        /// 根据ID获取用户信息
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        Sys_UsersModel GetUserByID(IDataBase db,int userID);
+        /// <summary>
+        /// 编辑用户信息
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        bool Edit(IDataBase db, Sys_UsersModel model);
         #endregion
     }
 }

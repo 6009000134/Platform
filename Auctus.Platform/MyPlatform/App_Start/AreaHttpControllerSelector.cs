@@ -9,21 +9,30 @@
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
-
+    /// <summary>
+    /// 控制器选择
+    /// </summary>
     public class AreaHttpControllerSelector : DefaultHttpControllerSelector
     {
         private const string AreaRouteVariableName = "area";
 
         private readonly HttpConfiguration _configuration;
         private readonly Lazy<ConcurrentDictionary<string, Type>> _apiControllerTypes;
-
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="configuration"></param>
         public AreaHttpControllerSelector(HttpConfiguration configuration)
             : base(configuration)
         {
             _configuration = configuration;
             _apiControllerTypes = new Lazy<ConcurrentDictionary<string, Type>>(GetControllerTypes);
         }
-
+        /// <summary>
+        /// 获取请求对应控制器
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public override HttpControllerDescriptor SelectController(HttpRequestMessage request)
         {
             return this.GetApiController(request);

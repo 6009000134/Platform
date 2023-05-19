@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace MyPlatform.Common.Mail
 {
@@ -11,6 +12,12 @@ namespace MyPlatform.Common.Mail
     {
         // 邮件配置和信息
         public MailConfig config { get; set; }
+        public SmtpClient client { get; set; }
+        public MailHelper()
+        {
+            config = new MailConfig();
+            client = new SmtpClient();
+        }
         /// <summary>
         /// 发送邮件
         /// </summary>
@@ -19,12 +26,47 @@ namespace MyPlatform.Common.Mail
             try
             {
                 MailMessage mail = GetMail();
-                SmtpClient client = new SmtpClient(config.Host, config.Port);//TODO:配置在web.config中
-                client.Credentials = new NetworkCredential(config.Email, config.Password);
+                GetConfig();
                 client.Send(mail);
             }
             catch (Exception ex)
-            {           
+            {
+                throw ex;
+            }
+        }
+        private void GetConfig()
+        {
+            client.Host = config.Host;
+            if (config.Port!=0)
+            {
+                client.Port = config.Port;
+            }
+            client.Credentials = new NetworkCredential(config.Email, config.Password);
+        }
+        public void SendAsyncCancel()
+        {
+            GetConfig();
+            client.SendAsyncCancel();
+        }
+
+        public void SendMailAsync(SendCompletedEventHandler handler, object o)
+        {
+            try
+            {
+                MailMessage mail = GetMail();
+                //TODO:配置在web.config中
+                GetConfig();
+                if (handler != null)
+                {
+                    client.SendCompleted += handler;
+                }
+                
+                client.SendAsync(mail, o);
+                //client.SendAsyncCancel();
+            }
+            catch (Exception ex)
+            {
+
                 throw ex;
             }
         }
@@ -36,19 +78,43 @@ namespace MyPlatform.Common.Mail
         {
             MailMessage mailMsg = new MailMessage();
             // Attachment a = new Attachment("sss");                        
-            if (!string.IsNullOrEmpty(config.From.Address))
+            Regex reg = new Regex("^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$");
+            if (config.From != null)
             {
-                mailMsg.From = config.From;
+                if (reg.IsMatch(config.From.Address))
+                {
+                    mailMsg.From = config.From;
+                }
+                else
+                {
+                    throw new Exception("收件人地址【" + config.From.Address + "】不是正确的邮箱地址！");
+                }
             }
             else
             {
-                throw new Exception("收件人不能为空！");
+                throw new Exception("收件人地址未配置！");
             }
-            foreach (string item in config.To)
+            if (config.To != null)
             {
-                mailMsg.To.Add(item);
+
+                foreach (string item in config.To)
+                {
+                    if (reg.IsMatch(item))
+                    {
+                        mailMsg.To.Add(item);
+                    }
+                    else
+                    {
+                        throw new Exception("收件人【" + item + "】不是正确的邮箱地址");
+                    }
+                }
             }
-            if (config.Attachments.Count>0)
+            else
+            {
+                throw new Exception("收件人地址未配置！");
+            }
+            //TODO：完善附件邮件发送
+            if (config.Attachments.Count > 0)
             {
                 foreach (string path in config.Attachments)
                 {
@@ -56,14 +122,43 @@ namespace MyPlatform.Common.Mail
                     mailMsg.Attachments.Add(file);
                 }
             }
-            foreach (string item in config.CC)
+            if (config.CC != null)
             {
-                mailMsg.CC.Add(item);
+                foreach (string item in config.CC)
+                {
+                    if (!string.IsNullOrEmpty(item))
+                    {
+                        if (reg.IsMatch(item))
+                        {
+                            mailMsg.CC.Add(item);
+                        }
+                        else
+                        {
+                            throw new Exception("抄送人【" + item + "】不是正确的邮箱地址！");
+                        }
+                    }
+
+                }
             }
-            foreach (string item in config.Bcc)
+            if (config.Bcc != null)
             {
-                mailMsg.Bcc.Add(item);
+                foreach (string item in config.Bcc)
+                {
+                    if (!string.IsNullOrEmpty(item))
+                    {
+                        if (reg.IsMatch(item))
+                        {
+                            mailMsg.Bcc.Add(item);
+                        }
+                        else
+                        {
+                            throw new Exception("密送人【" + item + "】不是正确的邮箱地址！");
+                        }
+                    }
+
+                }
             }
+
             if (string.IsNullOrEmpty(config.IsBodyHtml) || config.IsBodyHtml == "true")
             {
                 mailMsg.IsBodyHtml = true;

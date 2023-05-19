@@ -75,7 +75,7 @@ namespace MyPlatform.Areas.Basic.Controllers
             //将文件原名和重命名文件保存到数据库
             //FileInfoBLL
             //string sql="Insert into sys_fileInfo "
-            file.SaveAs(newFileName);
+            file.SaveAs(fullFileName);
         }
         /// <summary>
         /// 获取指定目录下文件列表

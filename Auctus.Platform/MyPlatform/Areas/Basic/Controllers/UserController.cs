@@ -66,6 +66,46 @@ namespace MyPlatform.Areas.Basic.Controllers
             }
             return MyResponseMessage.SuccessJson(result);
         }
+        /// <summary>
+        /// 获取用户信息
+        /// </summary>
+        /// <param name="UserID"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public HttpResponseMessage Detail([FromBody]int userID)
+        {
+            ReturnData result = new ReturnData();
+            try
+            {
+                result.D = userBLL.GetUserByID(userID);
+                result.S = true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return MyResponseMessage.SuccessJson(result);
+        }
+        /// <summary>
+        /// 编辑用户信息
+        /// </summary>
+        /// <param name="model">用户对象</param>
+        /// <returns></returns>
+        [HttpPost]
+        public HttpResponseMessage Edit([FromBody]Sys_UsersModel model)
+        {
+            ReturnData result = new ReturnData();
+            try
+            {
+                result.D = userBLL.Edit(model);
+                result.S = true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            return MyResponseMessage.SuccessJson(result);
+        }
 
     }
 }
