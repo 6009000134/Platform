@@ -1,5 +1,4 @@
-﻿using MyPlatform.Model.Enum;
-using Oracle.ManagedDataAccess.Client;
+﻿using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Data;

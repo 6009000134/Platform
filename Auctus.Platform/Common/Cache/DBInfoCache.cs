@@ -20,7 +20,8 @@ namespace MyPlatform.Common.Cache
             if (DBList == null)
             {
                 XMLHelper xmlHelper = new XMLHelper();
-                xmlHelper.FilePath = System.Web.Hosting.HostingEnvironment.MapPath("~/DataBase.xml");
+                //xmlHelper.FilePath = System.Web.Hosting.HostingEnvironment.MapPath("~/DataBase.xml");
+                xmlHelper.FilePath = "D:\\刘飞\\项目\\lf\\Auctus.Platform\\Auctus.Platform\\ConsoleTest\\DataBase.xml";
                 List<Dictionary<string, string>> li = new List<Dictionary<string, string>>();
                 XmlNodeList nodeList = xmlHelper.GetNodeList("/root/DB");
                 foreach (XmlNode node in nodeList)

@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommandInfo.cs" />
+    <Compile Include="DBEnum.cs" />
     <Compile Include="DBHelperBase.cs" />
     <Compile Include="DBHelperFactory.cs" />
     <Compile Include="DbHelperSQL - 复制.cs" />
@@ -67,10 +68,6 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{61dcc9d9-044a-4024-9eeb-4d2963669dbe}</Project>
       <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Model\Model.csproj">
-      <Project>{A17B7BC5-6F6E-4812-9814-D92ADAB14F30}</Project>
-      <Name>Model</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,4 @@
 ﻿using MyPlatform.Common.Cache;
-using MyPlatform.Model.Enum;
 using System;
 using System.Collections.Generic;
 using System.Configuration;

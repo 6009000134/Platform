@@ -85,7 +85,7 @@ namespace MyPlatform.SQLServerDAL
                 string sql = "";
                 switch (db.DBType)
                 {
-                    case Model.Enum.DBEnum.SqlServer:
+                    case DBEnum.SqlServer:
                         sql = "select ";
                         for (int i = 0; i < objectInfo.Detail.Count; i++)
                         {
@@ -93,9 +93,9 @@ namespace MyPlatform.SQLServerDAL
                         }
                         sql = sql.TrimEnd(',') + " from " + objectInfo.Name;
                         break;
-                    case Model.Enum.DBEnum.MySql:
+                    case DBEnum.MySql:
                         break;
-                    case Model.Enum.DBEnum.Oracle:
+                    case DBEnum.Oracle:
                         break;
                     default:
                         break;

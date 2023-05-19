@@ -171,7 +171,7 @@ VALUES  ( N'' ,
                 IDataParameter[] paras = new IDataParameter[1];
                 switch (db.DBType)
                 {
-                    case Model.Enum.DBEnum.SqlServer:
+                    case DBEnum.SqlServer:
                         sql = " SELECT  1 FROM dbo.SysObjects WHERE ID = object_id(@tableName) AND OBJECTPROPERTY(ID, 'IsTable') = 1 ";
                         paras = new IDataParameter[1] { new SqlParameter("@tableName", SqlDbType.VarChar, 30) };
                         paras[0].Value = tableName;
@@ -181,8 +181,8 @@ VALUES  ( N'' ,
                         //    result.M = "数据库已经存在表名为：" + tableName + "的表";
                         //}
                         break;
-                    case Model.Enum.DBEnum.MySql:
-                    case Model.Enum.DBEnum.Oracle:
+                    case DBEnum.MySql:
+                    case DBEnum.Oracle:
                     default:
                         result.SetErrorMsg(db.DBType.ToString() + "数据库未实现！");
                         break;

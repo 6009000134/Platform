@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <DB>
+    <DBCon>Default</DBCon>
+    <DBName>CMS</DBName>
+    <DBType>0</DBType>
+    <DBTypeCode>SqlServer</DBTypeCode>
+    <ConnectionString>Data Source=localhost;Initial Catalog=CMS;User ID=sa;Password=123456</ConnectionString>
+  </DB>
+  <DB>
+    <DBCon>SqlDB</DBCon>
+    <DBName>CRMSystem</DBName>
+    <DBType>1</DBType>
+    <DBTypeCode>SqlServer</DBTypeCode>
+    <ConnectionString>Data Source=localhost;Initial Catalog=CRMSystem;User ID=sa;Password=123456</ConnectionString>
+  </DB>
+  <DB>
+    <DBCon>DiaryCon</DBCon>
+    <DBName>Diary</DBName>
+    <DBType>1</DBType>
+    <DBTypeCode>SqlServer</DBTypeCode>
+    <ConnectionString>Data Source=localhost;Initial Catalog=Diary;User ID=sa;Password=123456</ConnectionString>
+  </DB>
+  <DB>
+    <DBCon>MySqlCon</DBCon>
+    <DBName>au_mes</DBName>
+    <DBType>1</DBType>
+    <DBTypeCode>MySql</DBTypeCode>
+    <ConnectionString>SqlServer</ConnectionString>
+  </DB>
+  <DB>
+    <DBCon>OACon</DBCon>
+    <DBName>orcldb</DBName>
+    <DBType>2</DBType>
+    <DBTypeCode>Oracle</DBTypeCode>
+    <ConnectionString>user id=ecology;password=ecology;data source=192.168.20.29/orclpdb</ConnectionString>
+  </DB>
+</root>
+<!--DBCon数据库key，不可重复-->
+<!--DBName数据库真是名称-->
+<!--DBType数据库类型值-->
+<!--DBTypeCode数据库类型-->
+

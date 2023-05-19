@@ -20,50 +20,212 @@ using UFIDA.U9.CBO.PubBE.YYC;
 using System.Text.RegularExpressions;
 using Oracle.ManagedDataAccess.Client;
 using System.DirectoryServices;
+using System.Threading;
+using System.Net;
+using System.IO;
 
 namespace ConsoleTest
 {
+    class Obj {
+        public long ItemID { get; set; }
+        public string Name { get; set; }
+    }
+    class ClassA {
+        private string id;
+        private string id2;
+        private string id3;
+        public string id4;
+        public string ID { get; set; }
+        public decimal d { get; set; }
+        public int i { get; set; }
+        public ClassB B{get;set;}
+        public List<ClassB> BLi { get; set; }
 
+        public string Id
+        {
+            get
+            {
+                return id;
+            }
+
+            set
+            {
+                id = value;
+            }
+        }
+    }
+    class ClassB {
+        public string ID { get; set; }
+        public decimal d { get; set; }
+        public int i { get; set; }
+    }
     class Program
     {
         static void Main(string[] args)
         {
-            //域登录
-            string userAccount = "liufei";
-            DirectoryEntry du = new DirectoryEntry(@"LDAP://auctus.cn", userAccount, "Qwelsy@123");
-            DirectorySearcher src = new DirectorySearcher(du);
-            src.Filter = "(&(&(objectCategory=person)(objectClass=user))(sAMAccountName=" + userAccount + "))";
-            src.PropertiesToLoad.Add("cn");
-            src.SearchRoot = du;
-            src.SearchScope = SearchScope.Subtree;
-            SearchResult result = src.FindOne();
-
-
-            Console.ReadLine();
-            decimal a = 0.115m;
-            decimal b = 567;
-            decimal sss = a * b;
-            decimal ss=Math.Round(a*b, 2);
-            decimal ss2=decimal.Round(65.205m, 2, MidpointRounding.AwayFromZero);
-
-            Type t = a.GetType();
-            Console.WriteLine(t.FullName);
-            Console.WriteLine(t.Name);
-            Console.WriteLine(t.Namespace);
-            Console.WriteLine(t.GetProperties());
-
-            Console.WriteLine(t.Assembly.FullName);
-            Console.WriteLine(t.Assembly.CodeBase);
-            Console.WriteLine(t.Assembly.Location);
-            AssemblyName an = t.Assembly.GetName();
-            Console.WriteLine(an.CultureName);
-            Console.WriteLine(an.FullName);
-            Console.WriteLine(an.Name);
-            Console.WriteLine(an.Version);
-            Activator.CreateInstance(t);
+            ClassA c = new ClassA();
+            Type t = c.GetType();
+            FieldInfo[] fi=GetFields(c.GetType());
+            foreach (FieldInfo item in fi)
+            {
+                Console.WriteLine(item.Name);
+            }
+         
             Console.ReadLine();
         }
+        public static FieldInfo[] GetFields(Type t)
+        {
+            return t.GetFields();
+        }
+        public static PropertyInfo[] GetProperties(Type t)
+        {
+            return t.GetProperties();
+        }
+        public static MethodInfo[] GetMethods(Type t)
+        {
+            return t.GetMethods();
+        }
+        public static MemberInfo[] GetMembers(Type t)
+        {
+            return t.GetMembers();
+        }
+        public static Type[] GetNestedTypes(Type t)
+        {
+            return t.GetNestedTypes();
+        }
+        public static ConstructorInfo[] GetConstructors(Type t)
+        {
+            return t.GetConstructors();
+        }
+        public static string GetHouseInfo()
+        {
+            //ThreadPool.SetMaxThreads(5, 20);
+            Dictionary<string, int> dic = new Dictionary<string, int>();
+            dic.Add("Start", 0);
+            dic.Add("End", 500);
+            dic.Add("Th", 100);
+            //ThreadPool.QueueUserWorkItem(new WaitCallback(InsertData), dic);
+            Thread td = new Thread(new ParameterizedThreadStart(InsertData));
+            td.Start(dic);
+            Dictionary<string, int> dic2 = new Dictionary<string, int>();
+            dic2.Add("Start", 500);
+            dic2.Add("End", 1000);
+            dic2.Add("Th", 200);
+            //ThreadPool.QueueUserWorkItem(new WaitCallback(InsertData), dic);
+            Thread td2 = new Thread(new ParameterizedThreadStart(InsertData));
+            td2.Start(dic2);
+            //Dictionary<string, int> dic3 = new Dictionary<string, int>();
+            //dic3.Add("Start", 600);
+            //dic3.Add("End", 900);
+            //dic3.Add("Th", 300);
+            ////ThreadPool.QueueUserWorkItem(new WaitCallback(InsertData), dic);
+            //Thread td3 = new Thread(new ParameterizedThreadStart(InsertData));
+            //td3.Start(dic3);
 
+            //Dictionary<string, int> dic4 = new Dictionary<string, int>();
+            //dic4.Add("Start", 900);
+            //dic4.Add("End", 1200);
+            //dic4.Add("Th", 400);
+            ////ThreadPool.QueueUserWorkItem(new WaitCallback(InsertData), dic);
+            //Thread td4 = new Thread(new ParameterizedThreadStart(InsertData));
+            //td4.Start(dic4);
+
+            //Dictionary<string, int> dic5 = new Dictionary<string, int>();
+            //dic5.Add("Start", 1200);
+            //dic5.Add("End", 1500);
+            //dic5.Add("Th", 500);
+            ////ThreadPool.QueueUserWorkItem(new WaitCallback(InsertData), dic);
+            //Thread td5 = new Thread(new ParameterizedThreadStart(InsertData));
+            //td5.Start(dic5);
+
+            //dic = new Dictionary<string, int>();
+            //dic.Add("Start", 1500);
+            //dic.Add("End", 1600);
+            //dic.Add("Th", 500);
+            ////ThreadPool.QueueUserWorkItem(new WaitCallback(InsertData), dic);
+            //Thread td6 = new Thread(new ParameterizedThreadStart(InsertData));
+            //td6.Start(dic);
+
+            return "";
+        }
+        public static void InsertData(object d)
+        {
+            Dictionary<string, int> dicW = (Dictionary<string, int>)d;
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+            HttpHelper httpHelper = new HttpHelper();
+            IDataBase db = DBHelperFactory.Create("Default");
+            List<string> liSql = new List<string>();
+            for (int i = dicW["Start"]; i < dicW["End"]; i++)
+            {
+                dic = new Dictionary<string, object>();
+                dic.Add("district", -1);
+                dic.Add("pageSize", 50);
+                dic.Add("pageIndex", i);
+                Console.WriteLine("Time:"+DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")+"|"+dicW["Th"].ToString() + ":" + i.ToString());
+                //string result = httpHelper.Post("http://zjj.sz.gov.cn/szfdcscjy/esf/publicity/getHouseSourcelibraryList", MyPlatform.Common.JSONUtil.GetJson(dic));
+                //Dictionary<string, object> dicResult = MyPlatform.Common.JSONUtil.ParseFromJson<Dictionary<string, object>>(result);
+                //if (dicResult["status"].ToString() != "200")
+                //{
+                //    Thread.Sleep(120000);
+                //}
+                //Dictionary<string, object> dicResult2 = MyPlatform.Common.JSONUtil.ParseFromJson<Dictionary<string, object>>(dicResult["data"].ToString());
+                //List<Dictionary<string, object>> list = MyPlatform.Common.JSONUtil.ParseFromJson<List<Dictionary<string, object>>>(dicResult2["list"].ToString());
+                List<Dictionary<string, object>> list = GetDataList(httpHelper, MyPlatform.Common.JSONUtil.GetJson(dic));
+                if (list.Count > 0)
+                {
+                    for (int j = 0; j < list.Count; j++)
+                    {
+                        //foreach (string key in list[j].Keys)
+                        //{
+                        //    string v = list[j][key] == null ? "" : list[j][key].ToString();
+                        //    Console.WriteLine(key + ":" + v);
+                        //}
+                        string sql = string.Format(@"INSERT INTO dbo.sz_houseinfo
+        (ID,sedsID,seascId,seabcId,projectName,fullSerialNo,district,buildInArea,houseUsage,houseUsageSplice,floorNo,verifyCode,organName,contractDate,hxType
+,hxTypeStr,signDate,averagePriceTotal,status,houseStatus,threadID)VALUES  ( {0} ,{1} ,{2} ,{3} ,'{4}' ,'{5}' ,'{6}' ,'{7}' ,'{8}' ,'{9}' ,'{10}' ,'{11}' ,'{12}' ,'{13}' ,'{14}'
+,'{15}' ,'{16}' ,'{17}' ,'{18}' ,'{19}',{20}      
+        )", list[j]["id"], list[j]["sedsId"], list[j]["seascId"], 0, list[j]["projectName"].ToString().Replace('\'',' '), list[j]["fullSerialNo"], list[j]["district"]
+        , list[j]["buildInArea"], list[j]["houseUsage"], list[j]["houseUsageSplice"], list[j]["floorNo"], list[j]["verifyCode"], list[j]["organName"]
+        , list[j]["contractDate"], list[j]["hxType"], list[j]["hxTypeStr"], list[j]["signDate"], list[j]["averagePriceTotal"], ""
+        , list[j]["houseStatus"], dicW["Th"]);
+                        liSql.Add(sql);
+                    }
+                }
+                else
+                {
+                }
+                if (liSql.Count > 500)
+                {
+                    Console.WriteLine("ExecuteTran 500");
+                    db.ExecuteTran(liSql);
+                    liSql = new List<string>();
+                }
+            }
+            if (liSql.Count > 0)
+            {
+                Console.WriteLine("ExecuteTran others");
+                db.ExecuteTran(liSql);
+                liSql = new List<string>();
+            }
+        }
+        public static List<Dictionary<string, object>> GetDataList(HttpHelper http, string json)
+        {
+            string result = http.Post("http://zjj.sz.gov.cn/szfdcscjy/esf/publicity/getHouseSourcelibraryList", json);
+            List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
+            Dictionary<string, object> dicResult = MyPlatform.Common.JSONUtil.ParseFromJson<Dictionary<string, object>>(result);
+            if (dicResult["status"].ToString() == "200")
+            {
+                Dictionary<string, object> dicResult2 = MyPlatform.Common.JSONUtil.ParseFromJson<Dictionary<string, object>>(dicResult["data"].ToString());
+                list = MyPlatform.Common.JSONUtil.ParseFromJson<List<Dictionary<string, object>>>(dicResult2["list"].ToString());
+            }
+            else
+            {
+                Console.WriteLine("Sleep");
+                Thread.Sleep(60000);
+                list = GetDataList(http, json);
+            }
+            return list;
+        }
         public static string GetCRMCustomer()
         {
             string sql = "";

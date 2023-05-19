@@ -38,7 +38,7 @@ namespace MyPlatform.SQLServerDAL
             try
             {
                 // IDataBase db = DBHelperFactory.CreateDBInstance(DBName);
-                if (db.DBType == Model.Enum.DBEnum.SqlServer)//SqlServer
+                if (db.DBType == DBEnum.SqlServer)//SqlServer
                 {
                     StringBuilder sb = new StringBuilder();
                     if (model.Size > 0)
@@ -63,11 +63,11 @@ namespace MyPlatform.SQLServerDAL
                         result.S = true;
                     }
                 }
-                else if (db.DBType == Model.Enum.DBEnum.MySql)//MySql
+                else if (db.DBType == DBEnum.MySql)//MySql
                 {
                     result.SetErrorMsg("MySql数据库尚未实现！");
                 }
-                else if (db.DBType == Model.Enum.DBEnum.Oracle)//Oracle
+                else if (db.DBType == DBEnum.Oracle)//Oracle
                 {
                     result.SetErrorMsg("Oracle数据库尚未实现！");
                 }

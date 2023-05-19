@@ -109,7 +109,7 @@ namespace ConsoleTest
         /// <param name="body"></param>
         /// <param name="method"></param>
         /// <returns></returns>
-        private HttpWebRequest CreateRequest(string url, string body, string method)
+        public HttpWebRequest CreateRequest(string url, string body, string method)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = method;

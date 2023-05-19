@@ -1,6 +1,5 @@
 ﻿using MyPlatform.Common.Cache;
 using MyPlatform.DBUtility;
-using MyPlatform.Model;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
