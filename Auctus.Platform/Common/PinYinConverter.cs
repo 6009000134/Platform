@@ -19,7 +19,7 @@ namespace MyPlatform.Common
                 {
                     ChineseChar c = new ChineseChar(item);
                     string s = c.Pinyins[0].ToString();
-                    newChineseStr += s.Substring(0, s.Length - 1);
+                    newChineseStr += s.Substring(0, 1);
                 }
                 catch (Exception)
                 {

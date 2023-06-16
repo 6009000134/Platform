@@ -23,6 +23,7 @@ using System.DirectoryServices;
 using System.Threading;
 using System.Net;
 using System.IO;
+using System.Globalization;
 
 namespace ConsoleTest
 {
@@ -53,6 +54,10 @@ namespace ConsoleTest
                 id = value;
             }
         }
+        public string CallA(string str)
+        {
+            return str;
+        }
     }
     class ClassB {
         public string ID { get; set; }
@@ -63,15 +68,48 @@ namespace ConsoleTest
     {
         static void Main(string[] args)
         {
-            ClassA c = new ClassA();
-            Type t = c.GetType();
-            FieldInfo[] fi=GetFields(c.GetType());
-            foreach (FieldInfo item in fi)
-            {
-                Console.WriteLine(item.Name);
-            }
-         
+            ThreadPool.QueueUserWorkItem(new WaitCallback(TF), "ss");
+            int i;
+            TaskFactory tf = new TaskFactory();
+            int j;
+            
+            //Thread th = new Thread();
+            //th.
+            //ThreadPool.GetAvailableThreads(out i, out j);
+            //Console.WriteLine(i.ToString()+"a"+j.ToString());
+            object o = "11";
+            Task t = new Task(new Action<object>(AF), o);
+            t.Start();
+            List<Task> lt = new List<Task>();
+            lt.Add(t);
+            //Task.Run(lt);
+            Task.WaitAny(lt.ToArray());
+            Console.WriteLine("Finish any");
+
+            Task.WaitAll(lt.ToArray());
+            Console.WriteLine("Finish any");
+
+
+            //Task.Run()
+            //t.Start();
+            //ClassA c = new ClassA();
+            //Type t = c.GetType();
+            //FieldInfo[] fi=GetFields(c.GetType());
+            //foreach (FieldInfo item in fi)
+            //{
+            //    Console.WriteLine(item.Name);
+            //}
+
             Console.ReadLine();
+        }
+        public static void AF(object ss)
+        {
+            Console.WriteLine(ss.ToString());
+            Console.WriteLine("AF");
+        }
+        public static void TF(object ss)
+        {
+            Console.WriteLine(ss);
         }
         public static FieldInfo[] GetFields(Type t)
         {
