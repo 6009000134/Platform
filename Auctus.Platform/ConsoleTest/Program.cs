@@ -27,11 +27,13 @@ using System.Globalization;
 
 namespace ConsoleTest
 {
-    class Obj {
+    class Obj
+    {
         public long ItemID { get; set; }
         public string Name { get; set; }
     }
-    class ClassA {
+    class ClassA
+    {
         private string id;
         private string id2;
         private string id3;
@@ -39,7 +41,7 @@ namespace ConsoleTest
         public string ID { get; set; }
         public decimal d { get; set; }
         public int i { get; set; }
-        public ClassB B{get;set;}
+        public ClassB B { get; set; }
         public List<ClassB> BLi { get; set; }
 
         public string Id
@@ -59,48 +61,266 @@ namespace ConsoleTest
             return str;
         }
     }
-    class ClassB {
+    class ClassB
+    {
         public string ID { get; set; }
         public decimal d { get; set; }
         public int i { get; set; }
+        public List<TestEnum> li { get; set; }
     }
     class Program
     {
+        static string Fn(string s)
+        {
+            string result;
+            if (s.IndexOf("(") > -1)
+            {
+                int start = s.IndexOf("(");
+                int end = s.LastIndexOf(")");
+                string endStr = s.Substring(end, s.Length - end).Replace(')', ' ');
+                string kuohao = s.Substring(start + 1, end - start - 1);
+                string startStr = s.Substring(0, start + 1).Replace('(', ' ');
+                string newStr = startStr + Fn(kuohao) + endStr;
+                result = CalResult(newStr).ToString();
+            }
+            else
+            {
+                result = CalResult(s).ToString();
+            }
+            //假定括号都匹配
+
+
+            return result;
+        }
+        static int CalResult(string cal)
+        {
+            Stack<int> st = new Stack<int>();
+
+            char sign = '+';
+            int num = 0;
+            for (int i = 0; i < cal.Length; i++)
+            {
+                int d = 0;
+                char c = cal[i];
+                bool isInt = int.TryParse(c.ToString(), out d);
+                if (isInt)
+                {
+                    num = 10 * num + d;
+                }
+                if (!isInt || i == cal.Length - 1)
+                {
+                    int pre;
+                    switch (sign)
+                    {
+                        case '+':
+                            st.Push(num);
+                            break;
+                        case '-':
+                            st.Push((-1) * num);
+                            break;
+                        case '*':
+                            pre = st.Peek();
+                            st.Pop();
+                            st.Push(num * pre);
+                            break;
+                        case '/':
+                            pre = st.Peek();
+                            st.Pop();
+                            st.Push(pre / num);
+                            break;
+                        default:
+                            break;
+                    }
+                    //更新符号，数字清零
+                    sign = c;
+                    num = 0;
+                }
+            }
+            int result = 0;
+            while (st.Count() > 0)
+            {
+                result += st.Peek();
+                st.Pop();
+            }
+            return result;
+        }
         static void Main(string[] args)
         {
-            ThreadPool.QueueUserWorkItem(new WaitCallback(TF), "ss");
-            int i;
-            TaskFactory tf = new TaskFactory();
-            int j;
-            
-            //Thread th = new Thread();
-            //th.
-            //ThreadPool.GetAvailableThreads(out i, out j);
-            //Console.WriteLine(i.ToString()+"a"+j.ToString());
-            object o = "11";
-            Task t = new Task(new Action<object>(AF), o);
-            t.Start();
-            List<Task> lt = new List<Task>();
-            lt.Add(t);
-            //Task.Run(lt);
-            Task.WaitAny(lt.ToArray());
-            Console.WriteLine("Finish any");
+            HttpHelper http = new HttpHelper();
+            http.ContentType = "application/json";
+            Dictionary<string, object> dicInfo = new Dictionary<string, object>();
+            Dictionary<string, string> context = new Dictionary<string, string>();
+            context.Add("CultureName", "zh-CN");
+            context.Add("EntCode", "60");
+            context.Add("OrgCode", "300");
+            context.Add("UserCode", "1619");
+            dicInfo.Add("context",context);
+            dicInfo.Add("docName", "Auctus.CustomSV.AttachFile.AttachFile");
+            dicInfo.Add("action", "GetFile");
+            Dictionary<string, string> dicInputData = new Dictionary<string, string>();
+            dicInputData.Add("TemplateID", "a0602c67-34c1-4e0a-85ad-b5e3c8601b88");
+            dicInputData.Add("DocNo", "PO30220715005");
+            dicInfo.Add("inputData", Convert.ToBase64String(Encoding.UTF8.GetBytes(JSONUtil.GetJson<Dictionary<string, string>>(dicInputData))));            
+            string result=http.Post("http://192.168.1.82:90/U9/RestServices/Auctus.CustomSV.ICustomSV.svc/Do", JSONUtil.GetJson<Dictionary<string, object>>(dicInfo));
+            Dictionary<string,object> dic=JSONUtil.ParseFromJson<Dictionary<string,object>>(result);
+            Dictionary<string, object> dicD = JSONUtil.ParseFromJson<Dictionary<string, object>>(dic["d"].ToString());
+            Dictionary<string,object> dicData= JSONUtil.ParseFromJson<Dictionary<string, object>>(dicD["OutPutData"].ToString());
+            string fstr =dicData["FileString"].ToString();
+            //byte[] fsContent= JSONUtil.ParseFromJson<byte[]>(dicData["FileContent"].ToString());
+            byte[] fsContext = UTF8Encoding.UTF8.GetBytes(fstr);
+            FileStream fs = new FileStream("D:\\刘飞\\teest.pdf", FileMode.OpenOrCreate,FileAccess.Write);
+            fs.Write(fsContext, 0, fsContext.Length);
+            fs.Close();
+            return;
+            List<ClassB> li = new List<ClassB>();
+            ClassB b = new ClassB();
+            b.ID = "1";
+            b.i = 2;
+            b.d = 11;
+            ClassB b2 = new ClassB();
+            b2.ID = "1";
+            b2.i = 2;
+            b2.d = 11;
+            ClassB b3 = new ClassB();
+            b3.ID = "12";
+            b3.i = 2;
+            b3.d = 11;
+            li.Add(b);
+            li.Add(b2);
+            li.Add(b3);
+            string ss = string.Join(",", li.Select(m => m.ID).ToList().ToArray());
+            Console.WriteLine(ss);
+            var lis = li.GroupBy(m => new { m.ID, m.i }).Select(n => new { n.Key.ID, n.Key.i, Qty = n.Sum(x => x.d) }).ToList();
+            foreach (var item in lis)
+            {
+                Console.WriteLine(item.i);
+                Console.WriteLine(item.ID);
+                Console.WriteLine(item.Qty);
+            }
 
-            Task.WaitAll(lt.ToArray());
-            Console.WriteLine("Finish any");
+
+            //string cal = "(1+1)+2*3+1+(3/3)";
 
 
-            //Task.Run()
+            //Console.WriteLine(Fn(cal));
+
+            //UFIDA.U9.ISV.SM.RMRHeadDTO dto = new UFIDA.U9.ISV.SM.RMRHeadDTO();
+            //CreateCode(dto.GetType());
+            //CreateCode(typeof(UFIDA.U9.ISV.SM.RMRDTO), "rmrDto");
+            //CreateCode(typeof(UFIDA.U9.SM.RMR.RMRHead), "head");
+            //CreateCode(typeof(UFIDA.U9.ISV.SM.RMRDTO), "dto");
+
+            //CreateCode(typeof(ClassB));
+            //ThreadPool.QueueUserWorkItem(new WaitCallback(TF), "ss");
+            //TaskFactory tf = new TaskFactory();
+
+            //object o = "11";
+            //Task t = new Task(new Action<object>(AF), o);
             //t.Start();
-            //ClassA c = new ClassA();
-            //Type t = c.GetType();
-            //FieldInfo[] fi=GetFields(c.GetType());
-            //foreach (FieldInfo item in fi)
-            //{
-            //    Console.WriteLine(item.Name);
-            //}
+            //List<Task> lt = new List<Task>();
+            //lt.Add(t);
+            ////Task.Run(lt);
+            //Task.WaitAny(lt.ToArray());
+            //Console.WriteLine("Finish any");
+
+            //Task.WaitAll(lt.ToArray());
+            //Console.WriteLine("Finish any");
 
             Console.ReadLine();
+        }
+        public static void CreateCode()
+        {
+            UFIDA.U9.ISV.SM.RMRHeadDTO dto = new UFIDA.U9.ISV.SM.RMRHeadDTO();
+
+        }
+        public static void CreateCode(Type tp, string instanceName)
+        {
+            //获取类中属性
+            PropertyInfo[] pri = tp.GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.Instance);
+            //遍历属性
+            foreach (PropertyInfo pi in pri)
+            {
+                string c = "";
+                //是否为类
+                if (pi.PropertyType.IsClass)
+                {
+                    if (pi.PropertyType.IsGenericType)//判断是否为泛型
+                    {
+                        c = instanceName + "." + pi.Name + "= new " + pi.PropertyType.FullName + "();";
+                    }
+                    else
+                    {
+                        switch (pi.PropertyType.Name.ToLower())
+                        {
+                            case "string":
+                                c = instanceName + "." + pi.Name + "=\"\";";
+                                break;
+                            default:
+                                c = instanceName + "." + pi.Name + "= new " + pi.PropertyType.FullName + "();";
+                                break;
+                        }
+                    }
+                }
+                else if (pi.PropertyType.IsEnum)
+                {
+                    c = instanceName + "." + pi.Name + "= " + pi.PropertyType.FullName + ".Empty;";
+                }
+                else if (pi.PropertyType.IsByRef)
+                {
+                    c = pi.Name + "  ||||  " + pi.PropertyType.Name;
+                }
+                else if (pi.PropertyType.IsNested)
+                {
+                    c = instanceName + "." + pi.Name + "= new " + pi.PropertyType.FullName + "();";
+                }
+                else
+                {
+                    switch (pi.PropertyType.Name.ToLower())
+                    {
+                        //case "string":
+                        //    c =pi.Name+ pi.PropertyType.Name;
+                        //    break;
+                        case "datetime":
+                            c = instanceName + "." + pi.Name + "= DateTime.Now;";
+                            break;
+                        case "bool":
+                            c = instanceName + "." + pi.Name + "= false;";
+                            break;
+                        default:
+                            c = instanceName + "." + pi.Name + "= 0;";
+                            break;
+                    }
+                }
+                Console.WriteLine(c);
+            }
+            //for (int i = 0; i < pri.Length; i++)
+            //{
+            //    string c = "";
+            //    if (pri[i].MemberType == MemberTypes.Property)
+            //    {
+            //        switch (pri[i].PropertyType.Name.ToLower())
+            //        {
+            //            case "string":
+            //                c = "dto." + pri[i].Name + "= \"\";";
+            //                break;
+            //            case "int":
+            //                c = "dto." + pri[i].Name + "= 1;";
+            //                break;
+            //            default:
+            //                c = "dto." + pri[i].Name + "= new " + pri[i].PropertyType.Name + "();";
+            //                break;
+            //        }
+            //    }
+            //    else if (pri[i].MemberType == MemberTypes.TypeInfo)
+            //    {
+            //        c = "dto." + pri[i].Name + "= new " + pri[i].Name + "();";
+            //    }
+            //    else
+            //    {
+            //        c = "----------------dto." + pri[i].Name + "= new " + pri[i].Name + "();";
+            //    }
+            //    Console.WriteLine(c);
+            //}
         }
         public static void AF(object ss)
         {
@@ -199,7 +419,7 @@ namespace ConsoleTest
                 dic.Add("district", -1);
                 dic.Add("pageSize", 50);
                 dic.Add("pageIndex", i);
-                Console.WriteLine("Time:"+DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")+"|"+dicW["Th"].ToString() + ":" + i.ToString());
+                Console.WriteLine("Time:" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "|" + dicW["Th"].ToString() + ":" + i.ToString());
                 //string result = httpHelper.Post("http://zjj.sz.gov.cn/szfdcscjy/esf/publicity/getHouseSourcelibraryList", MyPlatform.Common.JSONUtil.GetJson(dic));
                 //Dictionary<string, object> dicResult = MyPlatform.Common.JSONUtil.ParseFromJson<Dictionary<string, object>>(result);
                 //if (dicResult["status"].ToString() != "200")
@@ -222,7 +442,7 @@ namespace ConsoleTest
         (ID,sedsID,seascId,seabcId,projectName,fullSerialNo,district,buildInArea,houseUsage,houseUsageSplice,floorNo,verifyCode,organName,contractDate,hxType
 ,hxTypeStr,signDate,averagePriceTotal,status,houseStatus,threadID)VALUES  ( {0} ,{1} ,{2} ,{3} ,'{4}' ,'{5}' ,'{6}' ,'{7}' ,'{8}' ,'{9}' ,'{10}' ,'{11}' ,'{12}' ,'{13}' ,'{14}'
 ,'{15}' ,'{16}' ,'{17}' ,'{18}' ,'{19}',{20}      
-        )", list[j]["id"], list[j]["sedsId"], list[j]["seascId"], 0, list[j]["projectName"].ToString().Replace('\'',' '), list[j]["fullSerialNo"], list[j]["district"]
+        )", list[j]["id"], list[j]["sedsId"], list[j]["seascId"], 0, list[j]["projectName"].ToString().Replace('\'', ' '), list[j]["fullSerialNo"], list[j]["district"]
         , list[j]["buildInArea"], list[j]["houseUsage"], list[j]["houseUsageSplice"], list[j]["floorNo"], list[j]["verifyCode"], list[j]["organName"]
         , list[j]["contractDate"], list[j]["hxType"], list[j]["hxTypeStr"], list[j]["signDate"], list[j]["averagePriceTotal"], ""
         , list[j]["houseStatus"], dicW["Th"]);
@@ -798,5 +1018,10 @@ namespace ConsoleTest
         public string openUserId { get; set; }
         public string name { get; set; }
 
+    }
+    public enum TestEnum
+    {
+        AC = 0,
+        BC = 1
     }
 }

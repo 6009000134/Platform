@@ -51,7 +51,7 @@ namespace MyPlatform.Filter
                     {
                         //actionContext.ControllerContext.Request.Properties
                         base.OnAuthorization(actionContext);
-                    }
+                    } 
                     else
                     {
                         actionContext.Response = MyPlatform.Utils.MyResponseMessage.UnAuthorized("访问的模块未授权，请联系管理员！");

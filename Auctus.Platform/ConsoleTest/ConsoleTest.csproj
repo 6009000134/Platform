@@ -61,8 +61,33 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UBF.System">
+      <HintPath>..\..\..\..\..\..\yonyou\U9V60\Portal\bin\UBF.System.dll</HintPath>
+    </Reference>
     <Reference Include="UFIDA.U9.CBO.PubBE">
       <HintPath>..\..\..\..\..\..\..\yonyou\Portal\ApplicationServer\Libs\UFIDA.U9.CBO.PubBE.dll</HintPath>
+    </Reference>
+    <Reference Include="UFIDA.U9.ISV.SM.SDIndustryChainSV">
+      <HintPath>..\..\..\..\..\..\yonyou\U9V60\Portal\ApplicationServer\Libs\UFIDA.U9.ISV.SM.SDIndustryChainSV.dll</HintPath>
+    </Reference>
+    <Reference Include="UFIDA.U9.ISV.SM.SDIndustryChainSV.Agent">
+      <HintPath>..\..\..\..\..\..\yonyou\U9V60\Portal\ApplicationServer\Libs\UFIDA.U9.ISV.SM.SDIndustryChainSV.Agent.dll</HintPath>
+    </Reference>
+    <Reference Include="UFIDA.U9.ISV.SM.SDIndustryChainSV.Deploy">
+      <HintPath>..\..\..\..\..\..\yonyou\U9V60\Portal\ApplicationServer\Libs\UFIDA.U9.ISV.SM.SDIndustryChainSV.Deploy.dll</HintPath>
+    </Reference>
+    <Reference Include="UFIDA.U9.SM.SMBE">
+      <HintPath>..\..\..\..\..\..\yonyou\U9V60\Portal\ApplicationServer\Libs\UFIDA.U9.SM.SMBE.dll</HintPath>
+    </Reference>
+    <Reference Include="UFIDA.U9.SM.SMBE.Deploy, Version=25.5401.43225.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\yonyou\U9V60\Portal\ApplicationServer\Libs\UFIDA.U9.SM.SMBE.Deploy.dll</HintPath>
+    </Reference>
+    <Reference Include="UFSoft.UBF.Business">
+      <HintPath>..\..\..\..\..\..\yonyou\U9V60\Portal\bin\UFSoft.UBF.Business.dll</HintPath>
+    </Reference>
+    <Reference Include="UFSoft.UBF.PL">
+      <HintPath>..\..\..\..\..\..\yonyou\U9V60\Portal\bin\UFSoft.UBF.PL.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
