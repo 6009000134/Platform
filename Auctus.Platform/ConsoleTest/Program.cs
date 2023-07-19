@@ -68,8 +68,177 @@ namespace ConsoleTest
         public int i { get; set; }
         public List<TestEnum> li { get; set; }
     }
+    public class ResultFileInfo
+    {
+        public string FileName { get; set; }
+        public byte[] FileContent { get; set; }
+        public string FileString { get; set; }
+        public string Extension { get; set; }
+    }
     class Program
     {
+        static void Main(string[] args)
+        {
+            //上传文件字节流 Start
+            string fileName = "D:\\刘飞\\tt.pdf";
+            FileStream fsUp = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+            byte[] upBytes = new byte[fsUp.Length];
+            fsUp.Read(upBytes, 0, (int)upBytes.Length);
+            fsUp.Close();
+            SqlConnection sqlCon2 = new SqlConnection("User Id=sa;Password=auctus@168;Data Source=192.168.1.82;Initial Catalog=AuctusERPD;packet size=4096;Max Pool size=500;Connection Timeout=15;persist security info=True;MultipleActiveResultSets=true;");
+            string sqlIns = @"INSERT INTO dbo.FileInfo
+        ( ID, FileName, Content, Compress )
+VALUES  ( @ID, -- ID - nvarchar(50)
+          @FileName, -- FileName - nvarchar(200)
+          @Content, -- Content - varbinary(max)
+          @Compress  -- Compress - bit
+          )";
+            SqlCommand cmd2 = new SqlCommand(sqlIns, sqlCon2);
+            SqlParameter[] pars = {new SqlParameter("@ID",SqlDbType.NVarChar),new SqlParameter("@FileName", SqlDbType.NVarChar),new SqlParameter("@Content",SqlDbType.VarBinary),new SqlParameter("@Compress", SqlDbType.Bit) };
+            pars[0].Value = Guid.NewGuid().ToString();
+            pars[1].Value ="test"+DateTime.Now.ToString()+".pdf";
+            pars[2].Value = upBytes;
+            pars[3].Value = false;
+            cmd2.Parameters.AddRange(pars);
+            sqlCon2.Open();
+            cmd2.ExecuteNonQuery();
+            sqlCon2.Close();
+            //上传文件字节流 End
+            return;
+
+            //下载U9文件 Start
+            SqlConnection sqlCon = new SqlConnection("User Id=sa;Password=auctus@168;Data Source=192.168.1.82;Initial Catalog=AuctusERPD;packet size=4096;Max Pool size=500;Connection Timeout=15;persist security info=True;MultipleActiveResultSets=true;");
+            string sql = "select [content] from fileinfo where id='0493d4a0-0e94-49c3-8d55-ad34920d9f96'";
+            SqlCommand cmd = new SqlCommand(sql, sqlCon);
+            sqlCon.Open();
+            SqlDataReader sdr = cmd.ExecuteReader();            
+            FileStream u9FS = new FileStream("D:\\刘飞\\tt.pdf", FileMode.OpenOrCreate, FileAccess.Write);
+            if (sdr.Read())
+            {
+                
+                int bufferLength = 1024;
+                byte[] buffer = new byte[bufferLength];
+                BinaryWriter binaryWriter = new BinaryWriter(u9FS);
+                long offset = 0L;
+                long bytes = sdr.GetBytes(0, offset, buffer, 0, bufferLength);
+                while (bytes == bufferLength)
+                {
+                    binaryWriter.Write(buffer);
+                    binaryWriter.Flush();
+                    offset += (long)bufferLength;
+                    bytes=sdr.GetBytes(0, offset, buffer, 0, bufferLength);
+                }
+                if (bytes > 0L)
+                {
+                    binaryWriter.Write(buffer, 0, (int)bytes);
+                }
+                binaryWriter.Flush();
+            }
+            sdr.Close();
+            sqlCon.Close();
+
+            //下载U9文件 End
+            return;
+            
+            //获取e签宝文件
+            string resultStr=GetEFile("1");
+            return;
+
+            HttpHelper http = new HttpHelper();
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("");
+            request.Headers.Add("X-Tsign-Open-App-Id:11");
+            request.Headers.Add("X-Tsign-Open-Auth-Mode:Signature");
+            request.Headers.Add("X-Tsign-Open-Ca-Signature:11");
+            request.Headers.Add("X-Tsign-Open-Ca-Timestamp:11");
+            request.Headers.Add("X-Tsign-Open-Ca-Timestamp:11");
+            request.Headers.Add("Content-MD5");
+            request.Accept = "*/*";
+            request.ContentType = "application/json; charset=UTF-8";
+
+
+            http.ContentType = "application/json";            
+            Dictionary<string, object> dicInfo = new Dictionary<string, object>();
+            Dictionary<string, string> context = new Dictionary<string, string>();
+            context.Add("CultureName", "zh-CN");
+            context.Add("EntCode", "60");
+            context.Add("OrgCode", "300");
+            context.Add("UserCode", "1619");
+            dicInfo.Add("context", context);
+            dicInfo.Add("docName", "Auctus.CustomSV.AttachFile.AttachFile");
+            dicInfo.Add("action", "GetPOFile");
+            Dictionary<string, string> dicInputData = new Dictionary<string, string>();
+            dicInputData.Add("TemplateID", "a0602c67-34c1-4e0a-85ad-b5e3c8601b88");
+            dicInputData.Add("DocNo", "PO30220715005");
+            dicInfo.Add("inputData", Convert.ToBase64String(Encoding.UTF8.GetBytes(JSONUtil.GetJson<Dictionary<string, string>>(dicInputData))));
+            string result = http.Post("http://192.168.1.82:90/U9/RestServices/Auctus.CustomSV.ICustomSV.svc/Do", JSONUtil.GetJson<Dictionary<string, object>>(dicInfo));
+            Dictionary<string, object> dic = JsonHelper.JsonDeserializeJS<Dictionary<string, object>>(result);
+            Dictionary<string, object> dicD = JsonHelper.JsonDeserializeJS<Dictionary<string, object>>(dic["d"].ToString());
+            Dictionary<string, object> dicData = (Dictionary<string, object>)dicD["OutPutData"];
+            string fstr = dicData["FileString"].ToString();
+            byte[] fsContext = Convert.FromBase64String(fstr);
+
+            FileStream fs = new FileStream("D:\\刘飞\\teest.pdf", FileMode.OpenOrCreate, FileAccess.Write);
+            fs.Seek(0, SeekOrigin.Begin);
+            fs.Write(fsContext, 0, fsContext.Length);
+            fs.SetLength(fsContext.Length);
+            fs.Close();
+            fs.Dispose();
+
+            Console.ReadLine();
+        }
+        public static string GetEFile(string SignFlow)
+        {
+            //https://{host}/v3/sign-flow/{signFlowId}/file-download-url
+            HttpWebRequest request=CreateRequest("https://smlopenapi.esign.cn/v3/sign-flow/" + SignFlow+"/file-download-url", "", "GET");
+            string result = GetResponse(request);
+            return result;
+        }
+        public static long GetTimeSpan()
+        {
+            DateTime utcTime = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now);
+            DateTime utcStartTime = new DateTime(1970,1,1,0,0,0,0);
+            TimeSpan ts = utcTime - utcStartTime;
+            return Convert.ToInt64(ts.TotalMilliseconds);
+        }
+        public static HttpWebRequest CreateRequest(string url, string body, string method)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = method;
+            request.ContentType = "application/json";
+            /*
+             AppID：7438973960
+             AppSecret：e2d453c0af8eee24a859292f8bf4a50a
+             */
+
+            request.Headers.Add("X-Tsign-Open-App-Id:7438973960");
+            request.Headers.Add("X-Tsign-Open-Auth-Mode:Signature");
+            request.Headers.Add("X-Tsign-Open-Ca-Signature:7438973960");
+            request.Headers.Add("X-Tsign-Open-Ca-Timestamp:"+ GetTimeSpan().ToString());
+            request.Headers.Add("Accept:7438973960");
+            //request.Headers.Add("Content-MD5:7438973960");
+            //request.Timeout = TimeOut;
+            byte[] bodys;
+
+            bodys = Encoding.UTF8.GetBytes(body);
+            request.ContentLength = bodys.Length;
+            //request.GetRequestStream().Write(bodys, 0, bodys.Length);
+            return request;
+        }
+        /// <summary>
+        /// 获取Response结果字符串
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        private static string GetResponse(HttpWebRequest request)
+        {
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            StreamReader sr = new StreamReader(response.GetResponseStream());
+            string responseStr = sr.ReadToEnd();
+            response.Close();
+            sr.Close();
+            request.Abort();
+            return responseStr;
+        }
         static string Fn(string s)
         {
             string result;
@@ -144,90 +313,7 @@ namespace ConsoleTest
             }
             return result;
         }
-        static void Main(string[] args)
-        {
-            HttpHelper http = new HttpHelper();
-            http.ContentType = "application/json";
-            Dictionary<string, object> dicInfo = new Dictionary<string, object>();
-            Dictionary<string, string> context = new Dictionary<string, string>();
-            context.Add("CultureName", "zh-CN");
-            context.Add("EntCode", "60");
-            context.Add("OrgCode", "300");
-            context.Add("UserCode", "1619");
-            dicInfo.Add("context",context);
-            dicInfo.Add("docName", "Auctus.CustomSV.AttachFile.AttachFile");
-            dicInfo.Add("action", "GetFile");
-            Dictionary<string, string> dicInputData = new Dictionary<string, string>();
-            dicInputData.Add("TemplateID", "a0602c67-34c1-4e0a-85ad-b5e3c8601b88");
-            dicInputData.Add("DocNo", "PO30220715005");
-            dicInfo.Add("inputData", Convert.ToBase64String(Encoding.UTF8.GetBytes(JSONUtil.GetJson<Dictionary<string, string>>(dicInputData))));            
-            string result=http.Post("http://192.168.1.82:90/U9/RestServices/Auctus.CustomSV.ICustomSV.svc/Do", JSONUtil.GetJson<Dictionary<string, object>>(dicInfo));
-            Dictionary<string,object> dic=JSONUtil.ParseFromJson<Dictionary<string,object>>(result);
-            Dictionary<string, object> dicD = JSONUtil.ParseFromJson<Dictionary<string, object>>(dic["d"].ToString());
-            Dictionary<string,object> dicData= JSONUtil.ParseFromJson<Dictionary<string, object>>(dicD["OutPutData"].ToString());
-            string fstr =dicData["FileString"].ToString();
-            //byte[] fsContent= JSONUtil.ParseFromJson<byte[]>(dicData["FileContent"].ToString());
-            byte[] fsContext = UTF8Encoding.UTF8.GetBytes(fstr);
-            FileStream fs = new FileStream("D:\\刘飞\\teest.pdf", FileMode.OpenOrCreate,FileAccess.Write);
-            fs.Write(fsContext, 0, fsContext.Length);
-            fs.Close();
-            return;
-            List<ClassB> li = new List<ClassB>();
-            ClassB b = new ClassB();
-            b.ID = "1";
-            b.i = 2;
-            b.d = 11;
-            ClassB b2 = new ClassB();
-            b2.ID = "1";
-            b2.i = 2;
-            b2.d = 11;
-            ClassB b3 = new ClassB();
-            b3.ID = "12";
-            b3.i = 2;
-            b3.d = 11;
-            li.Add(b);
-            li.Add(b2);
-            li.Add(b3);
-            string ss = string.Join(",", li.Select(m => m.ID).ToList().ToArray());
-            Console.WriteLine(ss);
-            var lis = li.GroupBy(m => new { m.ID, m.i }).Select(n => new { n.Key.ID, n.Key.i, Qty = n.Sum(x => x.d) }).ToList();
-            foreach (var item in lis)
-            {
-                Console.WriteLine(item.i);
-                Console.WriteLine(item.ID);
-                Console.WriteLine(item.Qty);
-            }
 
-
-            //string cal = "(1+1)+2*3+1+(3/3)";
-
-
-            //Console.WriteLine(Fn(cal));
-
-            //UFIDA.U9.ISV.SM.RMRHeadDTO dto = new UFIDA.U9.ISV.SM.RMRHeadDTO();
-            //CreateCode(dto.GetType());
-            //CreateCode(typeof(UFIDA.U9.ISV.SM.RMRDTO), "rmrDto");
-            //CreateCode(typeof(UFIDA.U9.SM.RMR.RMRHead), "head");
-            //CreateCode(typeof(UFIDA.U9.ISV.SM.RMRDTO), "dto");
-
-            //CreateCode(typeof(ClassB));
-            //ThreadPool.QueueUserWorkItem(new WaitCallback(TF), "ss");
-            //TaskFactory tf = new TaskFactory();
-
-            //object o = "11";
-            //Task t = new Task(new Action<object>(AF), o);
-            //t.Start();
-            //List<Task> lt = new List<Task>();
-            //lt.Add(t);
-            ////Task.Run(lt);
-            //Task.WaitAny(lt.ToArray());
-            //Console.WriteLine("Finish any");
-
-            //Task.WaitAll(lt.ToArray());
-            //Console.WriteLine("Finish any");
-
-            Console.ReadLine();
-        }
         public static void CreateCode()
         {
             UFIDA.U9.ISV.SM.RMRHeadDTO dto = new UFIDA.U9.ISV.SM.RMRHeadDTO();
