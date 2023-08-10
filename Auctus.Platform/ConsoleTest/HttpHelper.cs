@@ -115,11 +115,16 @@ namespace ConsoleTest
             request.Method = method;
             request.ContentType = ContentType;
             request.Timeout = TimeOut;
-            byte[] bodys;
-            
-            bodys=Encoding.UTF8.GetBytes(body);
-            request.ContentLength = bodys.Length;
-            request.GetRequestStream().Write(bodys, 0, bodys.Length);
+            if (!string.IsNullOrEmpty(body))
+            {
+                byte[] bodys;
+
+                bodys = Encoding.UTF8.GetBytes(body);
+                request.ContentLength = bodys.Length;
+                Stream sw = request.GetRequestStream();
+                sw.Write(bodys, 0, bodys.Length);
+            }
+            //request.GetRequestStream().Write(bodys, 0, bodys.Length);
             return request;
         }
         /// <summary>
@@ -127,7 +132,7 @@ namespace ConsoleTest
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        private string GetResponse(HttpWebRequest request)
+        public string GetResponse(HttpWebRequest request)
         {
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             StreamReader sr = new StreamReader(response.GetResponseStream());

@@ -27,47 +27,6 @@ using System.Globalization;
 
 namespace ConsoleTest
 {
-    class Obj
-    {
-        public long ItemID { get; set; }
-        public string Name { get; set; }
-    }
-    class ClassA
-    {
-        private string id;
-        private string id2;
-        private string id3;
-        public string id4;
-        public string ID { get; set; }
-        public decimal d { get; set; }
-        public int i { get; set; }
-        public ClassB B { get; set; }
-        public List<ClassB> BLi { get; set; }
-
-        public string Id
-        {
-            get
-            {
-                return id;
-            }
-
-            set
-            {
-                id = value;
-            }
-        }
-        public string CallA(string str)
-        {
-            return str;
-        }
-    }
-    class ClassB
-    {
-        public string ID { get; set; }
-        public decimal d { get; set; }
-        public int i { get; set; }
-        public List<TestEnum> li { get; set; }
-    }
     public class ResultFileInfo
     {
         public string FileName { get; set; }
@@ -79,6 +38,26 @@ namespace ConsoleTest
     {
         static void Main(string[] args)
         {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(@"SELECT * FROM dbo.InvTrans_WhQoh a WHERE a.ItemOwnOrg=1 ");
+
+            sb.Append(" AND (");
+            for (int i = 0; i < 10; i++)
+            {
+                sb.Append("(a.ItemInfo_ItemID = 1 AND a.StorageType = 1 AND a.Wh = 1 AND a.LotInfo_LotCode = '123') OR");
+            }
+            sb.Remove(sb.Length - 2, 2);
+            sb.Append(" )");
+            string str = sb.ToString();
+            return;
+            GetHouseInfo();
+            return;
+            GetPOFile4U9();
+            return;
+            //9dedddbb25064405b7cd3ff5779a0bda
+            ESignUtils eu = new ESignUtils();
+            eu.GetFileUrl("9dedddbb25064405b7cd3ff5779a0bda");
+            return;
             //上传文件字节流 Start
             string fileName = "D:\\刘飞\\tt.pdf";
             FileStream fsUp = new FileStream(fileName, FileMode.Open, FileAccess.Read);
@@ -94,9 +73,9 @@ VALUES  ( @ID, -- ID - nvarchar(50)
           @Compress  -- Compress - bit
           )";
             SqlCommand cmd2 = new SqlCommand(sqlIns, sqlCon2);
-            SqlParameter[] pars = {new SqlParameter("@ID",SqlDbType.NVarChar),new SqlParameter("@FileName", SqlDbType.NVarChar),new SqlParameter("@Content",SqlDbType.VarBinary),new SqlParameter("@Compress", SqlDbType.Bit) };
+            SqlParameter[] pars = { new SqlParameter("@ID", SqlDbType.NVarChar), new SqlParameter("@FileName", SqlDbType.NVarChar), new SqlParameter("@Content", SqlDbType.VarBinary), new SqlParameter("@Compress", SqlDbType.Bit) };
             pars[0].Value = Guid.NewGuid().ToString();
-            pars[1].Value ="test"+DateTime.Now.ToString()+".pdf";
+            pars[1].Value = "test" + DateTime.Now.ToString() + ".pdf";
             pars[2].Value = upBytes;
             pars[3].Value = false;
             cmd2.Parameters.AddRange(pars);
@@ -111,11 +90,11 @@ VALUES  ( @ID, -- ID - nvarchar(50)
             string sql = "select [content] from fileinfo where id='0493d4a0-0e94-49c3-8d55-ad34920d9f96'";
             SqlCommand cmd = new SqlCommand(sql, sqlCon);
             sqlCon.Open();
-            SqlDataReader sdr = cmd.ExecuteReader();            
+            SqlDataReader sdr = cmd.ExecuteReader();
             FileStream u9FS = new FileStream("D:\\刘飞\\tt.pdf", FileMode.OpenOrCreate, FileAccess.Write);
             if (sdr.Read())
             {
-                
+
                 int bufferLength = 1024;
                 byte[] buffer = new byte[bufferLength];
                 BinaryWriter binaryWriter = new BinaryWriter(u9FS);
@@ -126,7 +105,7 @@ VALUES  ( @ID, -- ID - nvarchar(50)
                     binaryWriter.Write(buffer);
                     binaryWriter.Flush();
                     offset += (long)bufferLength;
-                    bytes=sdr.GetBytes(0, offset, buffer, 0, bufferLength);
+                    bytes = sdr.GetBytes(0, offset, buffer, 0, bufferLength);
                 }
                 if (bytes > 0L)
                 {
@@ -139,36 +118,42 @@ VALUES  ( @ID, -- ID - nvarchar(50)
 
             //下载U9文件 End
             return;
-            
+
             //获取e签宝文件
-            string resultStr=GetEFile("1");
+            string resultStr = GetEFile("1");
             return;
 
+
+
+            Console.ReadLine();
+        }
+        public static void GetPOFile4U9()
+        {
             HttpHelper http = new HttpHelper();
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("");
-            request.Headers.Add("X-Tsign-Open-App-Id:11");
-            request.Headers.Add("X-Tsign-Open-Auth-Mode:Signature");
-            request.Headers.Add("X-Tsign-Open-Ca-Signature:11");
-            request.Headers.Add("X-Tsign-Open-Ca-Timestamp:11");
-            request.Headers.Add("X-Tsign-Open-Ca-Timestamp:11");
-            request.Headers.Add("Content-MD5");
-            request.Accept = "*/*";
-            request.ContentType = "application/json; charset=UTF-8";
+            //HttpWebRequest request = (HttpWebRequest)WebRequest.Create("");
+            //request.Headers.Add("X-Tsign-Open-App-Id:11");
+            //request.Headers.Add("X-Tsign-Open-Auth-Mode:Signature");
+            //request.Headers.Add("X-Tsign-Open-Ca-Signature:11");
+            //request.Headers.Add("X-Tsign-Open-Ca-Timestamp:11");
+            //request.Headers.Add("X-Tsign-Open-Ca-Timestamp:11");
+            //request.Headers.Add("Content-MD5");
+            //request.Accept = "*/*";
+            //request.ContentType = "application/json; charset=UTF-8";
 
 
-            http.ContentType = "application/json";            
+            //http.ContentType = "application/json";
             Dictionary<string, object> dicInfo = new Dictionary<string, object>();
             Dictionary<string, string> context = new Dictionary<string, string>();
             context.Add("CultureName", "zh-CN");
             context.Add("EntCode", "60");
-            context.Add("OrgCode", "300");
-            context.Add("UserCode", "1619");
+            context.Add("OrgCode", "200");
+            context.Add("UserCode", "1990");
             dicInfo.Add("context", context);
             dicInfo.Add("docName", "Auctus.CustomSV.AttachFile.AttachFile");
             dicInfo.Add("action", "GetPOFile");
             Dictionary<string, string> dicInputData = new Dictionary<string, string>();
             dicInputData.Add("TemplateID", "a0602c67-34c1-4e0a-85ad-b5e3c8601b88");
-            dicInputData.Add("DocNo", "PO30220715005");
+            dicInputData.Add("DocNo", "PO20230727001");
             dicInfo.Add("inputData", Convert.ToBase64String(Encoding.UTF8.GetBytes(JSONUtil.GetJson<Dictionary<string, string>>(dicInputData))));
             string result = http.Post("http://192.168.1.82:90/U9/RestServices/Auctus.CustomSV.ICustomSV.svc/Do", JSONUtil.GetJson<Dictionary<string, object>>(dicInfo));
             Dictionary<string, object> dic = JsonHelper.JsonDeserializeJS<Dictionary<string, object>>(result);
@@ -183,20 +168,19 @@ VALUES  ( @ID, -- ID - nvarchar(50)
             fs.SetLength(fsContext.Length);
             fs.Close();
             fs.Dispose();
-
-            Console.ReadLine();
         }
+
         public static string GetEFile(string SignFlow)
         {
             //https://{host}/v3/sign-flow/{signFlowId}/file-download-url
-            HttpWebRequest request=CreateRequest("https://smlopenapi.esign.cn/v3/sign-flow/" + SignFlow+"/file-download-url", "", "GET");
+            HttpWebRequest request = CreateRequest("https://smlopenapi.esign.cn/v3/sign-flow/" + SignFlow + "/file-download-url", "", "GET");
             string result = GetResponse(request);
             return result;
         }
         public static long GetTimeSpan()
         {
             DateTime utcTime = TimeZoneInfo.ConvertTimeToUtc(DateTime.Now);
-            DateTime utcStartTime = new DateTime(1970,1,1,0,0,0,0);
+            DateTime utcStartTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
             TimeSpan ts = utcTime - utcStartTime;
             return Convert.ToInt64(ts.TotalMilliseconds);
         }
@@ -213,7 +197,7 @@ VALUES  ( @ID, -- ID - nvarchar(50)
             request.Headers.Add("X-Tsign-Open-App-Id:7438973960");
             request.Headers.Add("X-Tsign-Open-Auth-Mode:Signature");
             request.Headers.Add("X-Tsign-Open-Ca-Signature:7438973960");
-            request.Headers.Add("X-Tsign-Open-Ca-Timestamp:"+ GetTimeSpan().ToString());
+            request.Headers.Add("X-Tsign-Open-Ca-Timestamp:" + GetTimeSpan().ToString());
             request.Headers.Add("Accept:7438973960");
             //request.Headers.Add("Content-MD5:7438973960");
             //request.Timeout = TimeOut;
@@ -314,11 +298,6 @@ VALUES  ( @ID, -- ID - nvarchar(50)
             return result;
         }
 
-        public static void CreateCode()
-        {
-            UFIDA.U9.ISV.SM.RMRHeadDTO dto = new UFIDA.U9.ISV.SM.RMRHeadDTO();
-
-        }
         public static void CreateCode(Type tp, string instanceName)
         {
             //获取类中属性
@@ -408,15 +387,7 @@ VALUES  ( @ID, -- ID - nvarchar(50)
             //    Console.WriteLine(c);
             //}
         }
-        public static void AF(object ss)
-        {
-            Console.WriteLine(ss.ToString());
-            Console.WriteLine("AF");
-        }
-        public static void TF(object ss)
-        {
-            Console.WriteLine(ss);
-        }
+
         public static FieldInfo[] GetFields(Type t)
         {
             return t.GetFields();
