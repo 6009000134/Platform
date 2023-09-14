@@ -33,7 +33,7 @@
     <DBName>orcldb</DBName>
     <DBType>2</DBType>
     <DBTypeCode>Oracle</DBTypeCode>
-    <ConnectionString>user id=ecology;password=ecology;data source=192.168.20.29/orclpdb</ConnectionString>
+    <ConnectionString>Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.20.130)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=ecology)));User Id=ecology;Password=ecology;</ConnectionString>
   </DB>
 </root>
 <!--DBCon数据库key，不可重复-->

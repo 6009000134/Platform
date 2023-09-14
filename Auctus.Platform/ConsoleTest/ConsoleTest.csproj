@@ -98,6 +98,7 @@
     <Compile Include="HttpHelper.cs" />
     <Compile Include="HttpMethod.cs" />
     <Compile Include="MOSchedule.cs" />
+    <Compile Include="OracleHelper.cs" />
     <Compile Include="PostData.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -107,6 +108,7 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="SignatureVerificationException.cs" />
+    <Compile Include="U9TestUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

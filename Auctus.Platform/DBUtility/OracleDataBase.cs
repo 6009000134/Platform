@@ -33,6 +33,26 @@ namespace MyPlatform.DBUtility
 
         public int ExecuteNonQuery(string sql, IDataParameter[] paras)
         {
+            try
+            {
+                using (OracleConnection con = new OracleConnection(ConnectionString))
+                {
+                    OracleCommand cmd = new OracleCommand();
+                    cmd.Connection = con;
+                    cmd.CommandText = sql;
+                    cmd.Parameters.AddRange(paras);
+                    //OracleDataAdapter oda = new OracleDataAdapter(cmd);
+                    //oda.Fill(ds);
+                    con.Open();
+                    int i= cmd.ExecuteNonQuery();
+                    con.Close();
+                    return i;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
             throw new NotImplementedException();
         }
 

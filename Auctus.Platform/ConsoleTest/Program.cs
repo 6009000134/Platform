@@ -36,8 +36,72 @@ namespace ConsoleTest
     }
     class Program
     {
+       
         static void Main(string[] args)
         {
+            string dat = "";
+            DateTime da= Convert.ToDateTime(dat);
+            Console.WriteLine(da.ToShortDateString());
+            Console.ReadLine();
+            return;
+            Dictionary<string, string> strJsonDic = new Dictionary<string, string>();
+            strJsonDic.Add("oaCon", "OACon");
+            string strJson = JsonHelper.GetJsonJS(strJsonDic);
+            Dictionary<string, string> Json = new Dictionary<string, string>();
+            Json.Add("dllName", "Mes4OA");
+            Json.Add("spaceName", "Mes4OA.Job4OA");
+            Json.Add("methodName", "CommonDocNotice");
+            Json.Add("strJson", strJson);
+            string JsonStr = JsonHelper.GetJsonJS(Json);
+            Console.WriteLine(JsonStr);
+            Console.ReadLine();
+            return;
+
+            //MyPlatform.DBUtility.OracleDataBase db = new OracleDataBase("OACon");
+            //OracleHelper oracleHelper = new OracleHelper();
+            string sqlO = "update uf_customer set requestid =:requestid where id=:id";
+            OracleParameter[] oraclePars = { new OracleParameter(":requestid", 2), new OracleParameter(":id", 302184) };
+
+            string connStr = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.20.130)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=ecology)));User Id=ecology;Password=ecology;";
+            Console.WriteLine(OracleHelper.ExecuteNonQuery(connStr, CommandType.Text, sqlO, oraclePars));
+            //Console.WriteLine(db.ExecuteNonQuery(sqlO, oraclePars).ToString());
+            Console.ReadLine();
+            return;
+
+            //SaveFile2();
+            //return;
+            //获取文件字节流
+
+            string fileName = "D:\\刘飞\\All.log";
+            FileStream fsUp = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+            byte[] fileBytes = GetFileBytes(fileName);
+
+            Dictionary<string, object> dicU9Data = new Dictionary<string, object>();
+            dicU9Data.Add("CustomerName", "新兴县伟辉塑胶制品有限公司");
+            dicU9Data.Add("NDAContact", "测试");
+            dicU9Data.Add("NDAContactPhone", "18676704353");
+            dicU9Data.Add("NDAContactEMail", "test@auctus.com");
+            dicU9Data.Add("NDADisableDate", "2023-08-31 09:00");
+            dicU9Data.Add("FileName", "test.pdf");
+            dicU9Data.Add("FileContent", fileBytes);
+            dicU9Data.Add("OAFlowID", "123");
+
+            string ss = JSONUtil.GetJson<Dictionary<string, object>>(dicU9Data);
+            U9TestUtils u9Fun = new U9TestUtils();
+            string result = u9Fun.CallCustomSV("60", "300", "1619", "Auctus.CustomSV.Customer.CustCustomer", "Query", ss);
+
+            /*
+             {"CustomerName":"新兴县伟辉塑胶制品有限公司","":"","":"","":"","":"","":"","":""}
+             */
+
+
+            Console.Write(result);
+            Console.ReadLine();
+            return;
+            //9dedddbb25064405b7cd3ff5779a0bda
+            ESignUtils eu2 = new ESignUtils();
+            eu2.GetFileUrl("ffabb2d4e37a4af4b168ed3cde5fd891");
+            return;
             StringBuilder sb = new StringBuilder();
             sb.Append(@"SELECT * FROM dbo.InvTrans_WhQoh a WHERE a.ItemOwnOrg=1 ");
 
@@ -59,11 +123,7 @@ namespace ConsoleTest
             eu.GetFileUrl("9dedddbb25064405b7cd3ff5779a0bda");
             return;
             //上传文件字节流 Start
-            string fileName = "D:\\刘飞\\tt.pdf";
-            FileStream fsUp = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-            byte[] upBytes = new byte[fsUp.Length];
-            fsUp.Read(upBytes, 0, (int)upBytes.Length);
-            fsUp.Close();
+            byte[] upBytes = GetFileBytes("D:\\刘飞\\teest.pdf");
             SqlConnection sqlCon2 = new SqlConnection("User Id=sa;Password=auctus@168;Data Source=192.168.1.82;Initial Catalog=AuctusERPD;packet size=4096;Max Pool size=500;Connection Timeout=15;persist security info=True;MultipleActiveResultSets=true;");
             string sqlIns = @"INSERT INTO dbo.FileInfo
         ( ID, FileName, Content, Compress )
@@ -94,7 +154,6 @@ VALUES  ( @ID, -- ID - nvarchar(50)
             FileStream u9FS = new FileStream("D:\\刘飞\\tt.pdf", FileMode.OpenOrCreate, FileAccess.Write);
             if (sdr.Read())
             {
-
                 int bufferLength = 1024;
                 byte[] buffer = new byte[bufferLength];
                 BinaryWriter binaryWriter = new BinaryWriter(u9FS);
@@ -127,21 +186,88 @@ VALUES  ( @ID, -- ID - nvarchar(50)
 
             Console.ReadLine();
         }
+        /// <summary>
+        /// 文件转字节数组
+        /// </summary>
+        /// <param name="fullPath"></param>
+        /// <returns></returns>
+        public static byte[] GetFileBytes(string fullPath)
+        {
+            FileStream fsUp = new FileStream(fullPath, FileMode.Open, FileAccess.Read);
+            byte[] upBytes = new byte[fsUp.Length];
+            fsUp.Read(upBytes, 0, (int)upBytes.Length);
+            fsUp.Close();
+            return upBytes;
+        }
+        public static bool SaveFile2()
+        {
+            //下载U9文件 Start
+            SqlConnection sqlCon = new SqlConnection("User Id=sa;Password=auctus@168;Data Source=192.168.1.82;Initial Catalog=Test0306;packet size=4096;Max Pool size=500;Connection Timeout=15;persist security info=True;MultipleActiveResultSets=true;");
+            string sql = "select FileContent,ID from Auctus_NDAInfo where id=8";
+            SqlCommand cmd = new SqlCommand(sql, sqlCon);
+            sqlCon.Open();
+            SqlDataReader sdr = cmd.ExecuteReader();
+            FileStream u9FS = new FileStream("D:\\刘飞\\tt12.xlsx", FileMode.OpenOrCreate, FileAccess.Write);
+            if (sdr.Read())
+            {
+                int bufferLength = 1024;
+                byte[] buffer = new byte[bufferLength];
+                BinaryWriter binaryWriter = new BinaryWriter(u9FS);
+                long offset = 0L;
+                long bytes = sdr.GetBytes(0, offset, buffer, 0, bufferLength);
+                while (bytes == bufferLength)
+                {
+                    binaryWriter.Write(buffer);
+                    binaryWriter.Flush();
+                    offset += (long)bufferLength;
+                    bytes = sdr.GetBytes(0, offset, buffer, 0, bufferLength);
+                }
+                if (bytes > 0L)
+                {
+                    binaryWriter.Write(buffer, 0, (int)bytes);
+                }
+                binaryWriter.Flush();
+            }
+            sdr.Close();
+            sqlCon.Close();
+            return true;
+        }
+        public static bool SaveFile()
+        {
+            //下载U9文件 Start
+            SqlConnection sqlCon = new SqlConnection("User Id=sa;Password=auctus@168;Data Source=192.168.1.82;Initial Catalog=AuctusERPD;packet size=4096;Max Pool size=500;Connection Timeout=15;persist security info=True;MultipleActiveResultSets=true;");
+            string sql = "select [content],ID from fileinfo where id='0493d4a0-0e94-49c3-8d55-ad34920d9f96'";
+            SqlCommand cmd = new SqlCommand(sql, sqlCon);
+            sqlCon.Open();
+            SqlDataReader sdr = cmd.ExecuteReader();
+            FileStream u9FS = new FileStream("D:\\刘飞\\tt.pdf", FileMode.OpenOrCreate, FileAccess.Write);
+            if (sdr.Read())
+            {
+                int bufferLength = 1024;
+                byte[] buffer = new byte[bufferLength];
+                BinaryWriter binaryWriter = new BinaryWriter(u9FS);
+                long offset = 0L;
+                long bytes = sdr.GetBytes(0, offset, buffer, 0, bufferLength);
+                while (bytes == bufferLength)
+                {
+                    binaryWriter.Write(buffer);
+                    binaryWriter.Flush();
+                    offset += (long)bufferLength;
+                    bytes = sdr.GetBytes(0, offset, buffer, 0, bufferLength);
+                }
+                if (bytes > 0L)
+                {
+                    binaryWriter.Write(buffer, 0, (int)bytes);
+                }
+                binaryWriter.Flush();
+            }
+            sdr.Close();
+            sqlCon.Close();
+            return true;
+        }
         public static void GetPOFile4U9()
         {
             HttpHelper http = new HttpHelper();
-            //HttpWebRequest request = (HttpWebRequest)WebRequest.Create("");
-            //request.Headers.Add("X-Tsign-Open-App-Id:11");
-            //request.Headers.Add("X-Tsign-Open-Auth-Mode:Signature");
-            //request.Headers.Add("X-Tsign-Open-Ca-Signature:11");
-            //request.Headers.Add("X-Tsign-Open-Ca-Timestamp:11");
-            //request.Headers.Add("X-Tsign-Open-Ca-Timestamp:11");
-            //request.Headers.Add("Content-MD5");
-            //request.Accept = "*/*";
-            //request.ContentType = "application/json; charset=UTF-8";
-
-
-            //http.ContentType = "application/json";
             Dictionary<string, object> dicInfo = new Dictionary<string, object>();
             Dictionary<string, string> context = new Dictionary<string, string>();
             context.Add("CultureName", "zh-CN");

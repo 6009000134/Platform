@@ -72,6 +72,7 @@
     <Compile Include="DirectoryHelper.cs" />
     <Compile Include="Enum\Encoding.cs" />
     <Compile Include="Extend\MyExtends.cs" />
+    <Compile Include="FileHelper.cs" />
     <Compile Include="HttpHelper.cs" />
     <Compile Include="JSONUtil.cs" />
     <Compile Include="JWTTokenHelper.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Mail\MailConfig.cs" />
     <Compile Include="Mail\MailHelper.cs" />
     <Compile Include="ModelConverter.cs" />
+    <Compile Include="NetWorkUtils.cs" />
     <Compile Include="PinYinConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="XMLHelper.cs" />
