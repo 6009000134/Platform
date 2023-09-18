@@ -109,6 +109,7 @@
     </Compile>
     <Compile Include="SignatureVerificationException.cs" />
     <Compile Include="U9TestUtils.cs" />
+    <Compile Include="WebServiceHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

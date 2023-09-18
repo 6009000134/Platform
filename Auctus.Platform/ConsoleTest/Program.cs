@@ -24,6 +24,7 @@ using System.Threading;
 using System.Net;
 using System.IO;
 using System.Globalization;
+using System.Xml;
 
 namespace ConsoleTest
 {
@@ -36,154 +37,26 @@ namespace ConsoleTest
     }
     class Program
     {
-       
+
         static void Main(string[] args)
         {
-            string dat = "";
-            DateTime da= Convert.ToDateTime(dat);
-            Console.WriteLine(da.ToShortDateString());
-            Console.ReadLine();
-            return;
-            Dictionary<string, string> strJsonDic = new Dictionary<string, string>();
-            strJsonDic.Add("oaCon", "OACon");
-            string strJson = JsonHelper.GetJsonJS(strJsonDic);
-            Dictionary<string, string> Json = new Dictionary<string, string>();
-            Json.Add("dllName", "Mes4OA");
-            Json.Add("spaceName", "Mes4OA.Job4OA");
-            Json.Add("methodName", "CommonDocNotice");
-            Json.Add("strJson", strJson);
-            string JsonStr = JsonHelper.GetJsonJS(Json);
-            Console.WriteLine(JsonStr);
-            Console.ReadLine();
-            return;
-
-            //MyPlatform.DBUtility.OracleDataBase db = new OracleDataBase("OACon");
-            //OracleHelper oracleHelper = new OracleHelper();
-            string sqlO = "update uf_customer set requestid =:requestid where id=:id";
-            OracleParameter[] oraclePars = { new OracleParameter(":requestid", 2), new OracleParameter(":id", 302184) };
-
-            string connStr = "Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.20.130)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=ecology)));User Id=ecology;Password=ecology;";
-            Console.WriteLine(OracleHelper.ExecuteNonQuery(connStr, CommandType.Text, sqlO, oraclePars));
-            //Console.WriteLine(db.ExecuteNonQuery(sqlO, oraclePars).ToString());
-            Console.ReadLine();
-            return;
-
-            //SaveFile2();
-            //return;
-            //获取文件字节流
-
-            string fileName = "D:\\刘飞\\All.log";
-            FileStream fsUp = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-            byte[] fileBytes = GetFileBytes(fileName);
-
-            Dictionary<string, object> dicU9Data = new Dictionary<string, object>();
-            dicU9Data.Add("CustomerName", "新兴县伟辉塑胶制品有限公司");
-            dicU9Data.Add("NDAContact", "测试");
-            dicU9Data.Add("NDAContactPhone", "18676704353");
-            dicU9Data.Add("NDAContactEMail", "test@auctus.com");
-            dicU9Data.Add("NDADisableDate", "2023-08-31 09:00");
-            dicU9Data.Add("FileName", "test.pdf");
-            dicU9Data.Add("FileContent", fileBytes);
-            dicU9Data.Add("OAFlowID", "123");
-
-            string ss = JSONUtil.GetJson<Dictionary<string, object>>(dicU9Data);
-            U9TestUtils u9Fun = new U9TestUtils();
-            string result = u9Fun.CallCustomSV("60", "300", "1619", "Auctus.CustomSV.Customer.CustCustomer", "Query", ss);
-
-            /*
-             {"CustomerName":"新兴县伟辉塑胶制品有限公司","":"","":"","":"","":"","":"","":""}
-             */
-
-
-            Console.Write(result);
-            Console.ReadLine();
-            return;
-            //9dedddbb25064405b7cd3ff5779a0bda
-            ESignUtils eu2 = new ESignUtils();
-            eu2.GetFileUrl("ffabb2d4e37a4af4b168ed3cde5fd891");
-            return;
-            StringBuilder sb = new StringBuilder();
-            sb.Append(@"SELECT * FROM dbo.InvTrans_WhQoh a WHERE a.ItemOwnOrg=1 ");
-
-            sb.Append(" AND (");
-            for (int i = 0; i < 10; i++)
-            {
-                sb.Append("(a.ItemInfo_ItemID = 1 AND a.StorageType = 1 AND a.Wh = 1 AND a.LotInfo_LotCode = '123') OR");
-            }
-            sb.Remove(sb.Length - 2, 2);
-            sb.Append(" )");
-            string str = sb.ToString();
-            return;
-            GetHouseInfo();
-            return;
-            GetPOFile4U9();
-            return;
-            //9dedddbb25064405b7cd3ff5779a0bda
-            ESignUtils eu = new ESignUtils();
-            eu.GetFileUrl("9dedddbb25064405b7cd3ff5779a0bda");
-            return;
-            //上传文件字节流 Start
-            byte[] upBytes = GetFileBytes("D:\\刘飞\\teest.pdf");
-            SqlConnection sqlCon2 = new SqlConnection("User Id=sa;Password=auctus@168;Data Source=192.168.1.82;Initial Catalog=AuctusERPD;packet size=4096;Max Pool size=500;Connection Timeout=15;persist security info=True;MultipleActiveResultSets=true;");
-            string sqlIns = @"INSERT INTO dbo.FileInfo
-        ( ID, FileName, Content, Compress )
-VALUES  ( @ID, -- ID - nvarchar(50)
-          @FileName, -- FileName - nvarchar(200)
-          @Content, -- Content - varbinary(max)
-          @Compress  -- Compress - bit
-          )";
-            SqlCommand cmd2 = new SqlCommand(sqlIns, sqlCon2);
-            SqlParameter[] pars = { new SqlParameter("@ID", SqlDbType.NVarChar), new SqlParameter("@FileName", SqlDbType.NVarChar), new SqlParameter("@Content", SqlDbType.VarBinary), new SqlParameter("@Compress", SqlDbType.Bit) };
-            pars[0].Value = Guid.NewGuid().ToString();
-            pars[1].Value = "test" + DateTime.Now.ToString() + ".pdf";
-            pars[2].Value = upBytes;
-            pars[3].Value = false;
-            cmd2.Parameters.AddRange(pars);
-            sqlCon2.Open();
-            cmd2.ExecuteNonQuery();
-            sqlCon2.Close();
-            //上传文件字节流 End
-            return;
-
-            //下载U9文件 Start
-            SqlConnection sqlCon = new SqlConnection("User Id=sa;Password=auctus@168;Data Source=192.168.1.82;Initial Catalog=AuctusERPD;packet size=4096;Max Pool size=500;Connection Timeout=15;persist security info=True;MultipleActiveResultSets=true;");
-            string sql = "select [content] from fileinfo where id='0493d4a0-0e94-49c3-8d55-ad34920d9f96'";
-            SqlCommand cmd = new SqlCommand(sql, sqlCon);
-            sqlCon.Open();
-            SqlDataReader sdr = cmd.ExecuteReader();
-            FileStream u9FS = new FileStream("D:\\刘飞\\tt.pdf", FileMode.OpenOrCreate, FileAccess.Write);
-            if (sdr.Read())
-            {
-                int bufferLength = 1024;
-                byte[] buffer = new byte[bufferLength];
-                BinaryWriter binaryWriter = new BinaryWriter(u9FS);
-                long offset = 0L;
-                long bytes = sdr.GetBytes(0, offset, buffer, 0, bufferLength);
-                while (bytes == bufferLength)
-                {
-                    binaryWriter.Write(buffer);
-                    binaryWriter.Flush();
-                    offset += (long)bufferLength;
-                    bytes = sdr.GetBytes(0, offset, buffer, 0, bufferLength);
-                }
-                if (bytes > 0L)
-                {
-                    binaryWriter.Write(buffer, 0, (int)bytes);
-                }
-                binaryWriter.Flush();
-            }
-            sdr.Close();
-            sqlCon.Close();
-
-            //下载U9文件 End
-            return;
-
-            //获取e签宝文件
-            string resultStr = GetEFile("1");
-            return;
-
-
-
+            //Dictionary<string, string> ddd = new Dictionary<string, string>();
+            //ddd.Add("fileHandler", "13139055-308e-4a6d-b340-f4f8c185519d");
+            //string sasds=HttpMethod.PostMethod("http://u9test.auctus.cn:90/U9Service/U9Service.asmx/GetFileContent",ddd);
+            //string url = "http://u9test.auctus.cn:90/U9Service/U9Service.asmx/GetFileContent";
+            //HttpHelper http = new HttpHelper();
+            //http.ContentType = "application/x-www-form-urlencoded";
+            //string s = "fileHandler=13139055-308e-4a6d-b340-f4f8c185519d";
+            //string result22 = http.Post(url, s);
+            //byte[] byteArr = Convert.FromBase64String(result22);
+            Hashtable ht = new Hashtable();
+            ht.Add("in0", "dv12wegewqdx2321229flmqocdt765");//oa准入码
+            ht.Add("in1", "[{\"base\":{\"workflowid\":\"136022\",\"creator\":{\"value\":\"1619\",\"transrule\":\"getUseridByWorkcode\"},\"requestlevel\":1,\"isnextflow\":1,\"requestid\":\"\",\"requestname\":\"出货单：SM20202309009\",\"fpkid\":\"1002309151760065\"},\"main\":{\"sqr\":{\"value\":\"1619\",\"transrule\":\"getUseridByWorkcode\"},\"sqrgh\":{\"value\":\"1619\",\"transrule\":\"getWorkcodeByU9code\"},\"sqrgw\":{\"value\":\"1619\",\"transrule\":\"getJobidByWorkcode\"},\"ssbm\":{\"value\":\"1619\",\"transrule\":\"getDeptidByWorkcode\"},\"ssgs\":{\"value\":\"1619\",\"transrule\":\"getSubcomidByWorkcode\"},\"sqrq\":{\"value\":\"2023-09-15\"},\"dh\":{\"value\":\"SM20202309009\"},\"u9zz\":{\"value\":1001708020135435},\"khmc\":{\"value\":\"泉州力同科技有限公司\"},\"khsqzh\":{\"value\":\"QZLT001asd\"},\"khyx\":{\"value\":\"test2@auctus.comm\"},\"khlxrmc\":{\"value\":\"测试联系人\"},\"khlxrdh\":{\"value\":\"12312112212\"},\"fpkid\":{\"value\":1002309151760065}},\"dt1\":[{\"gnlx\":{\"value\":\"tests\"},\"sqsl\":{\"value\":11},\"lh\":{\"value\":1001708090327382},\"itemcode\":{\"value\":\"314010008\"},\"code\":{\"value\":\"test\"},\"orderno\":{\"value\":\"4\"}}]}]");//OA上下文和表单数据Json
+            //调用OA接口            
+            XmlDocument xd = WebServiceHelper.QuerySoapWebService("http://192.168.20.132/services/WorkflowServiceToOtherSystem", "createWorkflow", ht);
+            //LogError.LogData("OA创建流程接口返回结果:"+xd.DocumentElement.InnerText, "逾期流程");
+            //OA返回结果
+            string resultStr = Newtonsoft.Json.JsonConvert.SerializeObject(xd.DocumentElement.InnerText);
             Console.ReadLine();
         }
         /// <summary>
